@@ -51,12 +51,24 @@ class BusApiController extends Controller
     public function search(Request $request)
     {
         $destinationCity = $request->query('destination_city');
-        $filters = ['destination_city' => $destinationCity];
+        $departureCity = $request->query('departure_city');
+        $departureTime = $request->query('departure_time');
 
-        $busSearchService = new BusSearchService(); 
-        $buses = $busSearchService->searchBuses($filters); 
+        $filters = [];
 
-        return BusResource::collection($buses); 
+        if ($destinationCity) {
+            $filters['destination_city'] = $destinationCity;
+        }
+        if ($departureCity) {
+            $filters['departure_city'] = $departureCity;
+        }
+        if ($departureTime) {
+            $filters['departure_time'] = $departureTime;
+        }
+
+        $busSearchService = new BusSearchService();
+        $buses = $busSearchService->searchBuses($filters);
+
+        return BusResource::collection($buses);
     }
-
 }
