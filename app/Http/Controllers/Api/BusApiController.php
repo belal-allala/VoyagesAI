@@ -49,7 +49,7 @@ class BusApiController extends Controller
         //
     }
 
-    public function search(BusSearchRequest $request) 
+    public function search(BusSearchRequest $request)
     {
         $destinationCity = $request->query('destination_city');
         $departureCity = $request->query('departure_city');
@@ -70,6 +70,10 @@ class BusApiController extends Controller
         $busSearchService = new BusSearchService();
         $buses = $busSearchService->searchBuses($filters);
 
-        return BusResource::collection($buses);
+        if ($buses->isEmpty()) {
+            return response()->json(['message' => 'Aucun bus trouvé pour votre recherche.'], 200);
+        } else {
+            return BusResource::collection($buses);
+        }
     }
 }
