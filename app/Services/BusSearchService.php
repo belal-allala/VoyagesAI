@@ -14,6 +14,14 @@ class BusSearchService
             $query->where('destination_city', $filters['destination_city']);
         }
 
+        if (isset($filters['departure_city'])) {
+            $query->where('departure_city', $filters['departure_city']);
+        }
+
+        if (isset($filters['departure_time'])) {
+            $query->where('departure_time', $filters['departure_time']);
+        }
+
         return $query->get();
     }
 }
