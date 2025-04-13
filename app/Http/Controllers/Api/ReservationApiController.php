@@ -6,26 +6,18 @@ use App\Http\Controllers\Controller;
 use App\Models\Bus;
 use App\Models\Reservation;
 use Illuminate\Http\Request;
+use App\Http\Requests\CreateReservationRequest; 
 
 class ReservationApiController extends Controller
 {
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        // Pour l'instant, pas de validation
 
-        $reservation = Reservation::create([
-            'bus_id' => $request->input('bus_id'),
-            'user_id' => null, 
-            'passenger_name' => $request->input('passenger_name'),
-            'passenger_email' => $request->input('passenger_email'),
-            'seat_count' => $request->input('seat_count'),
-            'total_price' => $request->input('total_price'),
-            'reservation_date' => $request->input('reservation_date'),
-        ]);
+    /**
+     * Display a listing of the resource.
+     */
+    public function store(CreateReservationRequest $request)
+    {
+        $reservation = Reservation::create($request->validated()); 
 
         return response()->json(['reservation' => $reservation, 'message' => 'Réservation créée avec succès.'], 201);
     }
