@@ -8,6 +8,7 @@ use App\Models\Reservation;
 use Illuminate\Http\Request;
 use App\Http\Requests\CreateReservationRequest;
 use App\Http\Resources\ReservationResource; 
+use App\Http\Requests\UpdateReservationRequest;
 
 class ReservationApiController extends Controller
 {
@@ -34,9 +35,11 @@ class ReservationApiController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateReservationRequest $request, Reservation $reservation) 
     {
-        // ...
+        $reservation->update($request->validated()); 
+
+        return response()->json(['reservation' => new ReservationResource($reservation), 'message' => 'Réservation mise à jour avec succès.'], 200);
     }
 
     /**
