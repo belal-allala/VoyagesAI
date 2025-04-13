@@ -6,7 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Bus;
 use App\Models\Reservation;
 use Illuminate\Http\Request;
-use App\Http\Requests\CreateReservationRequest; 
+use App\Http\Requests\CreateReservationRequest;
+use App\Http\Resources\ReservationResource; 
 
 class ReservationApiController extends Controller
 {
@@ -25,9 +26,9 @@ class ReservationApiController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Reservation $reservation) 
     {
-        // ...
+        return response()->json(['reservation' => $reservation]); 
     }
 
     /**
