@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\RealTimeTrackingApiController;
 use App\Http\Controllers\Api\ReservationApiController; 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Models\Reservation;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,3 +26,4 @@ Route::get('/buses/search', [BusApiController::class, 'search']);
 Route::get('/bus-locations', [RealTimeTrackingApiController::class, 'getBusLocations']);
 
 Route::post('/reservations', [ReservationApiController::class, 'store']);
+Route::get('/reservations/{reservation}', [ReservationApiController::class, 'show']);
