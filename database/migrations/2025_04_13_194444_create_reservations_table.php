@@ -13,6 +13,14 @@ return new class extends Migration
     {
         Schema::create('reservations', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('bus_id')->constrained('buses');
+            $table->foreignId('user_id')->nullable()->constrained('users');
+            $table->string('passenger_name');
+            $table->string('passenger_email');
+            $table->integer('seat_count');
+            $table->decimal('total_price', 8, 2);
+            $table->dateTime('reservation_date');
+            $table->string('status')->default('pending');
             $table->timestamps();
         });
     }
