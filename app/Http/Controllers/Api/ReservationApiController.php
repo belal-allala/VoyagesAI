@@ -28,7 +28,7 @@ class ReservationApiController extends Controller
      */
     public function show(Reservation $reservation) 
     {
-        return response()->json(['reservation' => $reservation]); 
+        return new ReservationResource($reservation); 
     }
 
     /**
