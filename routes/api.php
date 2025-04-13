@@ -28,3 +28,4 @@ Route::get('/bus-locations', [RealTimeTrackingApiController::class, 'getBusLocat
 Route::post('/reservations', [ReservationApiController::class, 'store']);
 Route::get('/reservations/{reservation}', [ReservationApiController::class, 'show']);
 Route::put('/reservations/{reservation}', [ReservationApiController::class, 'update']);
+Route::delete('/reservations/{reservation}', [ReservationApiController::class, 'destroy']);
