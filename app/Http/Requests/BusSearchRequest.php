@@ -11,18 +11,20 @@ class BusSearchRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array|string>
      */
     public function rules(): array
     {
         return [
-            //
+            'destination_city' => 'nullable|string',
+            'departure_city' => 'nullable|string',
+            'departure_time' => 'nullable|date_format:Y-m-d H:i:s',
         ];
     }
 }
