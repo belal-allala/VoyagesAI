@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Services\BusSearchService;
 
 class BusApiController extends Controller
 {
@@ -46,4 +47,16 @@ class BusApiController extends Controller
     {
         //
     }
+
+    public function search(Request $request)
+    {
+        $destinationCity = $request->query('destination_city');
+        $filters = ['destination_city' => $destinationCity];
+
+        $busSearchService = new BusSearchService(); 
+        $buses = $busSearchService->searchBuses($filters); 
+
+        return BusResource::collection($buses); 
+    }
+
 }

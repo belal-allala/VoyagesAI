@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Services;
+
 use App\Models\Bus;
 
 class BusSearchService
@@ -13,6 +14,6 @@ class BusSearchService
             $query->where('destination_city', $filters['destination_city']);
         }
 
-        return $query->get(); 
+        return $query->get();
     }
 }
