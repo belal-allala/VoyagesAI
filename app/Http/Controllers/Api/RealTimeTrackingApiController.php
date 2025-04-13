@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Http\Resources\BusLocationResource;
 
 class RealTimeTrackingApiController extends Controller
 {
@@ -51,6 +52,6 @@ class RealTimeTrackingApiController extends Controller
     {
         $busLocations = BusLocation::all();
 
-        return response()->json(['bus_locations' => $busLocations]);
+        return BusLocationResource::collection($busLocations); 
     }
 }
