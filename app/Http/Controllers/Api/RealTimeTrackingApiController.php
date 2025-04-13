@@ -46,4 +46,11 @@ class RealTimeTrackingApiController extends Controller
     {
         //
     }
+
+    public function getBusLocations()
+    {
+        $busLocations = BusLocation::all();
+
+        return response()->json(['bus_locations' => $busLocations]);
+    }
 }
