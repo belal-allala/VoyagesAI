@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\BusApiController;
 use App\Http\Controllers\Api\RealTimeTrackingApiController;
+use App\Http\Controllers\Api\ReservationApiController; 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -21,4 +22,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::get('/buses/search', [BusApiController::class, 'search']);
-Route::get('/bus-locations', [RealTimeTrackingApiController::class, 'getBusLocations']); 
+Route::get('/bus-locations', [RealTimeTrackingApiController::class, 'getBusLocations']);
+
+Route::post('/reservations', [ReservationApiController::class, 'store']);
