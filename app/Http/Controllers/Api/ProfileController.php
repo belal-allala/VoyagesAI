@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Http\Resources\UserResource; // Importez UserResource
+use App\Http\Resources\UserResource; 
+use App\Http\Requests\UpdateProfileRequest;
+
 
 class ProfileController extends Controller
 {
@@ -19,5 +21,18 @@ class ProfileController extends Controller
         $user = $request->user(); 
 
         return new UserResource($user); 
+    }
+
+    /**
+     * Update the specified resource in storage, validated by UpdateProfileRequest.
+     *
+     * @param  \App\Http\Requests\UpdateProfileRequest  $request // <-- Utilisez UpdateProfileRequest
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function update(UpdateProfileRequest $request)
+    {
+        $user = $request->user(); 
+        $user->update($request->validated()); 
+        return response()->json(new UserResource($user), 200); 
     }
 }
