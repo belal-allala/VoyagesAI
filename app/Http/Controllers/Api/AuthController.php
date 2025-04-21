@@ -57,4 +57,16 @@ class AuthController extends Controller
             'token_type' => 'Bearer',
         ], 200); 
     }
+
+    /**
+     * Log the user out (Invalidate the token).
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function logout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete(); 
+        return response()->json(['message' => 'Déconnexion réussie.']);
+    }
 }
