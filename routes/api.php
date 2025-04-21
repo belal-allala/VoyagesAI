@@ -9,6 +9,7 @@ use App\Models\Reservation;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Api\ProfileController;
+use App\Http\Controllers\StripeWebhookController;
 
 /*
 |--------------------------------------------------------------------------
@@ -50,3 +51,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/profile', [ProfileController::class, 'update']);
     Route::post('/reservations/confirm', [ReservationApiController::class, 'confirmReservation']); 
 });
+
+Route::post('/stripe/webhooks', [StripeWebhookController::class, 'handleWebhook']);
