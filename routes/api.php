@@ -46,3 +46,4 @@ Route::middleware(['auth:sanctum', 'role:compagnie'])->get('/compagnie-route', f
 });
 
 Route::middleware('auth:sanctum')->get('/profile', [ProfileController::class, 'profile']);
+Route::put('/profile', [ProfileController::class, 'update']);
