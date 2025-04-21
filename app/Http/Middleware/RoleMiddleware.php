@@ -11,10 +11,20 @@ class RoleMiddleware
     /**
      * Handle an incoming request.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * @param  string  $role // Le rôle requis comme argument
      */
-    public function handle(Request $request, Closure $next): Response
+    public function handle(Request $request, Closure $next, string $role): Response
     {
-        return $next($request);
+        if (!$request->user()) { 
+            return response('Unauthorized', 401); 
+        }
+
+        if ($request->user()->role === $role) {
+            return $next($request);
+        }
+
+        return response('Accès interdit.', 403); 
     }
 }
