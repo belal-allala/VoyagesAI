@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\ReservationApiController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Models\Reservation;
+use App\Http\Controllers\Api\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,6 +22,10 @@ use App\Models\Reservation;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::post('/register', [AuthController::class, 'register']); 
+Route::post('/login', [AuthController::class, 'login']); 
+Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 
 Route::get('/buses/search', [BusApiController::class, 'search']);
 Route::get('/bus-locations', [RealTimeTrackingApiController::class, 'getBusLocations']);
