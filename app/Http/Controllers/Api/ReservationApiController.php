@@ -9,10 +9,24 @@ use Illuminate\Http\Request;
 use App\Http\Requests\CreateReservationRequest;
 use App\Http\Resources\ReservationResource; 
 use App\Http\Requests\UpdateReservationRequest;
+use App\Services\StripeService;
 
 class ReservationApiController extends Controller
 {
 
+    /**
+     * @var \App\Services\StripeService
+     */
+    protected $stripeService;
+
+    /**
+     * Constructeur.
+     * @param \App\Services\StripeService $stripeService
+     */
+    public function __construct(StripeService $stripeService) 
+    {
+        $this->stripeService = $stripeService; 
+    }
 
     /**
      * Display a listing of the resource.
@@ -35,11 +49,11 @@ class ReservationApiController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateReservationRequest $request, Reservation $reservation) 
+    public function update(UpdateReservationRequest $request)
     {
-        $reservation->update($request->validated()); 
-
-        return response()->json(['reservation' => new ReservationResource($reservation), 'message' => 'Réservation mise à jour avec succès.'], 200);
+        $user = $request->user();
+        $user->update($request->validated());
+        return response()->json(new UserResource($user), 200);
     }
 
     /**
@@ -50,5 +64,30 @@ class ReservationApiController extends Controller
         $reservation->delete(); 
 
         return response()->json(['message' => 'Réservation supprimée avec succès.'], 200); 
+    }
+
+    /**
+     * Create Stripe PaymentIntent.
+     */
+    public function confirmReservation(Request $request)
+    {
+        $reservationId = $request->input('reservation_id'); 
+        $reservation = Reservation::findOrFail($reservationId); 
+
+        $amount = $reservation->total_price * 100; 
+
+        $stripeClient = $this->stripeService->getStripeClient(); 
+
+        $paymentIntent = $stripeClient->paymentIntents->create([ 
+            'amount' => $amount,
+            'currency' => 'eur', 
+            'automatic_payment_methods' => [
+                'enabled' => true, 
+            ],
+        ]);
+
+        return response()->json([
+            'clientSecret' => $paymentIntent->client_secret, 
+        ], 200);
     }
 }
