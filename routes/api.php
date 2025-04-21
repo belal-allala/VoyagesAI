@@ -39,3 +39,7 @@ Route::delete('/reservations/{reservation}', [ReservationApiController::class, '
 Route::middleware('auth:sanctum')->get('/protected', function (Request $request) { 
     return response()->json(['message' => 'Vous êtes authentifié !', 'user' => $request->user()]); 
 });
+
+Route::middleware(['auth:sanctum', 'role:compagnie'])->get('/compagnie-route', function (Request $request) { 
+    return response()->json(['message' => 'Bienvenue, Compagnie !', 'user' => $request->user()]); 
+});
