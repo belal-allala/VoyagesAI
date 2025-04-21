@@ -43,3 +43,5 @@ Route::middleware('auth:sanctum')->get('/protected', function (Request $request)
 Route::middleware(['auth:sanctum', 'role:compagnie'])->get('/compagnie-route', function (Request $request) { 
     return response()->json(['message' => 'Bienvenue, Compagnie !', 'user' => $request->user()]); 
 });
+
+Route::middleware('auth:sanctum')->get('/profile', [ProfileController::class, 'profile']);
