@@ -45,5 +45,8 @@ Route::middleware(['auth:sanctum', 'role:compagnie'])->get('/compagnie-route', f
     return response()->json(['message' => 'Bienvenue, Compagnie !', 'user' => $request->user()]); 
 });
 
-Route::middleware('auth:sanctum')->get('/profile', [ProfileController::class, 'profile']);
-Route::put('/profile', [ProfileController::class, 'update']);
+Route::middleware('auth:sanctum')->group(function () { 
+    Route::get('/profile', [ProfileController::class, 'profile']);
+    Route::put('/profile', [ProfileController::class, 'update']);
+    Route::post('/reservations/confirm', [ReservationApiController::class, 'confirmReservation']); 
+});
