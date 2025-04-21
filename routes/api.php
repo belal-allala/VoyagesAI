@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Models\Reservation;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Controller;
 
 /*
 |--------------------------------------------------------------------------
@@ -34,3 +35,7 @@ Route::post('/reservations', [ReservationApiController::class, 'store']);
 Route::get('/reservations/{reservation}', [ReservationApiController::class, 'show']);
 Route::put('/reservations/{reservation}', [ReservationApiController::class, 'update']);
 Route::delete('/reservations/{reservation}', [ReservationApiController::class, 'destroy']);
+
+Route::middleware('auth:sanctum')->get('/protected', function (Request $request) { 
+    return response()->json(['message' => 'Vous êtes authentifié !', 'user' => $request->user()]); 
+});
