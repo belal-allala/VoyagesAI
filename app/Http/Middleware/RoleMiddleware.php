@@ -21,7 +21,7 @@ class RoleMiddleware
             return response('Unauthorized', 401); 
         }
 
-        if ($request->user()->role === $role) {
+        if ($request->user()->hasRole($role)) {
             return $next($request);
         }
 
