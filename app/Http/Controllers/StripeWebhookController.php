@@ -51,17 +51,18 @@ class StripeWebhookController extends Controller
 
     protected function handlePaymentIntentSucceeded($paymentIntent)
     {
-        $reservation = Reservation::where('total_price', $paymentIntent->amount / 100)->first();
+        $reservationId = $paymentIntent->metadata->reservation_id;
+        $reservation = Reservation::find($reservationId);
         if ($reservation) {
             $reservation->status = 'confirmed';
             $reservation->save();
         }
-
     }
 
     protected function handlePaymentIntentPaymentFailed($paymentIntent)
     {
-        $reservation = Reservation::where('total_price', $paymentIntent->amount / 100)->first();
+        $reservationId = $paymentIntent->metadata->reservation_id;
+        $reservation = Reservation::find($reservationId);
         if ($reservation) {
             $reservation->status = 'payment_failed';
             $reservation->save();
