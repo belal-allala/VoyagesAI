@@ -5,7 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Stripe\Webhook;
 use Stripe\Exception\SignatureVerificationException;
-use App\Models\Reservation; // Importez le modèle Reservation
+use App\Models\Reservation; 
+use App\Notifications\ReservationConfirmation;
 
 class StripeWebhookController extends Controller
 {
@@ -52,10 +53,15 @@ class StripeWebhookController extends Controller
     protected function handlePaymentIntentSucceeded($paymentIntent)
     {
         $reservationId = $paymentIntent->metadata->reservation_id;
+
         $reservation = Reservation::find($reservationId);
         if ($reservation) {
             $reservation->status = 'confirmed';
             $reservation->save();
+            if ($reservation->user) { 
+                $reservation->user->notify(new ReservationConfirmation($reservation));
+            }
+
         }
     }
 
