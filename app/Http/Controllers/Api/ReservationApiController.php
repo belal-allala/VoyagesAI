@@ -71,23 +71,26 @@ class ReservationApiController extends Controller
      */
     public function confirmReservation(Request $request)
     {
-        $reservationId = $request->input('reservation_id'); 
-        $reservation = Reservation::findOrFail($reservationId); 
+        $reservationId = $request->input('reservation_id');
+        $reservation = Reservation::findOrFail($reservationId);
 
-        $amount = $reservation->total_price * 100; 
+        $amount = $reservation->total_price * 100;
 
-        $stripeClient = $this->stripeService->getStripeClient(); 
+        $stripeClient = $this->stripeService->getStripeClient();
 
-        $paymentIntent = $stripeClient->paymentIntents->create([ 
+        $paymentIntent = $stripeClient->paymentIntents->create([
             'amount' => $amount,
-            'currency' => 'eur', 
+            'currency' => 'eur',
             'automatic_payment_methods' => [
-                'enabled' => true, 
+                'enabled' => true,
+            ],
+            'metadata' => [ 
+                'reservation_id' => $reservation->id, 
             ],
         ]);
 
         return response()->json([
-            'clientSecret' => $paymentIntent->client_secret, 
+            'clientSecret' => $paymentIntent->client_secret,
         ], 200);
     }
 }
