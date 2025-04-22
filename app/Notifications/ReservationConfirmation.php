@@ -47,12 +47,14 @@ class ReservationConfirmation extends Notification
      * @param  mixed  $notifiable
      * @return \Illuminate\Notifications\Messages\MailMessage
      */
+    
     public function toMail($notifiable)
     {
         return (new MailMessage)
-                    ->line('The introduction to the notification.')
-                    ->action('View Notification', url('/'))
-                    ->line('Thank you for using our application!');
+            ->subject('Confirmation de votre réservation VoyageAI') 
+            ->markdown('mail.reservation.confirmation', [ 
+                'reservation' => $this->reservation, 
+            ]);
     }
 
     /**
