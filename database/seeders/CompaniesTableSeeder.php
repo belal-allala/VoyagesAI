@@ -21,6 +21,6 @@ class CompaniesTableSeeder extends Seeder
         //     'description' => 'A fictional bus company for testing purposes.',
         // ]);
 
-        ompany::factory()->count(5)->create()
+        ompany::factory()->count(5)->create();
     }
 }
