@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
             BusesTableSeeder::class,
             BusLocationsTableSeeder::class,
             ReservationsTableSeeder::class,
+            CompaniesTableSeeder::class,
         ]);
     }
 }

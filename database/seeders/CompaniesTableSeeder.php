@@ -1,12 +1,8 @@
-
-**Contenu du fichier modifié :** `database/seeders/CompaniesTableSeeder.php` (méthode `run()` implémentée)
-
-```php
 <?php
 
 namespace Database\Seeders;
 
-use App\Models\Company; // Importez le modèle Company
+use App\Models\Company; 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
