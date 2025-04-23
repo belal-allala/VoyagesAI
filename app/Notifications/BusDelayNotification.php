@@ -6,17 +6,22 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use App\Models\Reservation;
 
 class BusDelayNotification extends Notification
 {
     use Queueable;
 
+    protected $reservation;
+    protected $delayMinutes;
+
     /**
      * Create a new notification instance.
      */
-    public function __construct()
+    public function __construct(Reservation $reservation, int $delayMinutes)
     {
-        //
+        $this->reservation = $reservation;
+        $this->delayMinutes = $delayMinutes;
     }
 
     /**
@@ -24,7 +29,7 @@ class BusDelayNotification extends Notification
      *
      * @return array<int, string>
      */
-    public function via(object $notifiable): array
+    public function via($notifiable)
     {
         return ['mail'];
     }
@@ -32,11 +37,11 @@ class BusDelayNotification extends Notification
     /**
      * Get the mail representation of the notification.
      */
-    public function toMail(object $notifiable): MailMessage
+    public function toMail($notifiable)
     {
         return (new MailMessage)
                     ->line('The introduction to the notification.')
-                    ->action('Notification Action', url('/'))
+                    ->action('View Notification', url('/'))
                     ->line('Thank you for using our application!');
     }
 
