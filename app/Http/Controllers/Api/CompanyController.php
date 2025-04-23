@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Company;
 
 class CompanyController extends Controller
 {
@@ -20,7 +21,15 @@ class CompanyController extends Controller
      */
     public function store(Request $request)
     {
-        //
+         $company = Company::create([
+            'name' => $request->input('name'), 
+            'email' => $request->input('email'), 
+            'phone' => $request->input('phone'), 
+            'address' => $request->input('address'), 
+            'description' => $request->input('description'), 
+        ]);
+
+          return response()->json(['company' => $company, 'message' => 'Entreprise créée avec succès.'], 201);
     }
 
     /**
