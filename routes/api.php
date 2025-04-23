@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\StripeWebhookController;
+use App\Http\Controllers\Api\CompanyController;
 
 /*
 |--------------------------------------------------------------------------
@@ -53,3 +54,5 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 
 Route::post('/stripe/webhooks', [StripeWebhookController::class, 'handleWebhook']);
+
+Route::resource('companies', CompanyController::class);
