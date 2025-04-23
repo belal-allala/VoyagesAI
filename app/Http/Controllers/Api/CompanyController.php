@@ -53,8 +53,10 @@ class CompanyController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Company $company) 
     {
-        //
+        $company->delete();
+
+        return response()->noContent(204);
     }
 }
