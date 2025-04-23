@@ -40,9 +40,11 @@ class BusDelayNotification extends Notification
     public function toMail($notifiable)
     {
         return (new MailMessage)
-                    ->line('The introduction to the notification.')
-                    ->action('View Notification', url('/'))
-                    ->line('Thank you for using our application!');
+            ->subject('Information importante : Retard de votre voyage VoyageAI')
+            ->markdown('mail.reservation.delay', [ 
+                'reservation' => $this->reservation,
+                'delayMinutes' => $this->delayMinutes,
+            ]);
     }
 
     /**
