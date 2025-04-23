@@ -13,14 +13,14 @@ class CompaniesTableSeeder extends Seeder
      */
     public function run(): void
     {
-         Company::create([
-            'name' => 'Test Company A',
-            'email' => 'companyA@example.com',
-            'phone' => '+33 1 23 45 67 89',
-            'address' => '10 rue de la Paix, 75000 Paris',
-            'description' => 'A fictional bus company for testing purposes.',
-        ]);
+        //  Company::create([
+        //     'name' => 'Test Company A',
+        //     'email' => 'companyA@example.com',
+        //     'phone' => '+33 1 23 45 67 89',
+        //     'address' => '10 rue de la Paix, 75000 Paris',
+        //     'description' => 'A fictional bus company for testing purposes.',
+        // ]);
 
-    
+        ompany::factory()->count(5)->create()
     }
 }
