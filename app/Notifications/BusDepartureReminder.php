@@ -34,10 +34,11 @@ class BusDepartureReminder extends Notification
      */
     public function toMail($notifiable)
     {
-         return (new MailMessage)
-                ->line('The introduction to the notification.')
-                ->action('View Notification', url('/'))
-                ->line('Thank you for using our application!');
+        return (new MailMessage)
+            ->subject('Rappel de votre prochain voyage avec VoyageAI') 
+            ->markdown('mail.reservation.reminder', [ 
+                'reservation' => $this->reservation, 
+            ]);
     }
 
     /**
