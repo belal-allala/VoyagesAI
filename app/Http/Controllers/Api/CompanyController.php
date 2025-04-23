@@ -43,9 +43,11 @@ class CompanyController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateCompanyRequest $request, Company $company) 
     {
-        //
+        $company->update($request->validated()); 
+
+        return response()->json(['company' => $company, 'message' => 'Entreprise mise à jour avec succès.'], 200);
     }
 
     /**
