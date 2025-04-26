@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\WebAuthController;
+use App\Http\Controllers\BusController;
 
 /*
 |--------------------------------------------------------------------------
@@ -34,3 +35,5 @@ Route::get('/login', [WebAuthController::class, 'login'])->name('login');
 Route::post('/login', [WebAuthController::class, 'handleLogin'])->name('handleLogin');
 
 Route::post('/logout', [WebAuthController::class, 'logout'])->name('logout');
+
+Route::get('/bus/search', [BusController::class, 'search'])->name('bus.search');
