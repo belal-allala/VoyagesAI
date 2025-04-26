@@ -49,4 +49,25 @@ class WebAuthController extends Controller
 
         return redirect()->route('welcome')->with('message', 'Déconnexion réussie.');
     }
+
+    public function login()
+    {
+        return view('auth.login');
+    }
+
+    public function handleLogin(LoginRequest $request)
+    {
+        $credentials = $request->validated();
+
+        if (Auth::attempt($credentials)) {
+            $request->session()->regenerate();
+
+            return redirect()->intended(route('home'))
+                            ->with('message', 'Connexion réussie.');
+        }
+
+        return back()->withErrors([
+            'email' => 'Les informations d identification fournies ne correspondent pas à nos enregistrements.',
+        ])->onlyInput('email');
+    }
 }
