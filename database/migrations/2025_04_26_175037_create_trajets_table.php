@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('trajets', function (Blueprint $table) {
             $table->id();
+            $table->string('name');
+            $table->foreignId('bus_id')->constrained('buses');
             $table->timestamps();
         });
     }
