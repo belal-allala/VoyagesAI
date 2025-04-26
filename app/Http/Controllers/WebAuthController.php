@@ -1,3 +1,7 @@
+
+**Contenu du fichier modifié :** `app/Http/Controllers/WebAuthController.php` (méthode `handleRegister` implémentée)
+
+```php
 <?php
 
 namespace App\Http\Controllers;
@@ -10,15 +14,24 @@ use Illuminate\Http\Request;
 class WebAuthController extends Controller
 {
     /**
-     * Register a new user.
+     * Display the registration view.
      *
-     * @param  \App\Http\Requests\RegisterRequest  $request
-     * @return \Illuminate\Http\RedirectResponse
+     * @return \Illuminate\View\View
      */
-    public function register(RegisterRequest $request) 
+    public function register()
+    {
+        return view('auth.register'); 
+    }
+
+    /**
+     * Handle a registration request for the application.
+     *
+     * @param  \App\Http\Requests\RegisterRequest  $request  //Request de validation
+     */
+    public function handleRegister(RegisterRequest $request)  // On utilise la bonne request
     {
         $user = User::create([
-            'name' => $request->name,
+            'name' => $request->validated('name'),
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role' => $request->role,
