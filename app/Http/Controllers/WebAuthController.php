@@ -1,7 +1,3 @@
-
-**Contenu du fichier modifié :** `app/Http/Controllers/WebAuthController.php` (méthode `handleRegister` implémentée)
-
-```php
 <?php
 
 namespace App\Http\Controllers;
