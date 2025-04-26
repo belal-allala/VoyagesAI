@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo; // Importez la relation BelongsTo
 
 class Bus extends Model
 {
@@ -15,12 +16,18 @@ class Bus extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'departure_city',
-        'destination_city',
-        'departure_time',
-        'price',
+        'name', 
         'capacity',
         'available_seats',
-        'company_name',
+        'company_name',  
+        'company_id', 
     ];
+
+    /**
+     * Get the company that owns the bus.
+     */
+    public function company(): BelongsTo // Définir la relation BelongsTo avec Company
+    {
+        return $this->belongsTo(Company::class);
+    }
 }
