@@ -4,9 +4,9 @@
         <div>
             <ul class="flex space-x-4">
                 <li><a href="{{ route('welcome') }}" class="hover:text-gray-700">Accueil</a></li>
-                {{-- <li><a href="{{ route('bus.search') }}" class="hover:text-gray-700">Recherche de Bus</a></li> --}}
                 @auth
                     <li><a href="{{ route('profile') }}" class="hover:text-gray-700">Mon Profil</a></li>
+                    <li><a href="{{ route('bus.search') }}" class="hover:text-gray-700">Recherche de Bus</a></li>
                     <li>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
