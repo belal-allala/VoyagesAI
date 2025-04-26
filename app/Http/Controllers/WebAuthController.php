@@ -6,6 +6,9 @@ use App\Models\User;
 use App\Http\Requests\RegisterRequest;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class WebAuthController extends Controller
 {
@@ -33,6 +36,17 @@ class WebAuthController extends Controller
             'role' => $request->role,
         ]);
 
-        return redirect()->route('home')->with('message', 'Compte créé avec succès. Veuillez vous connecter.');
+        return redirect()->route('welcome')->with('message', 'Compte créé avec succès. Veuillez vous connecter.');
+    }
+
+    public function logout(Request $request)
+    {
+        Auth::logout();
+
+        $request->session()->invalidate();
+
+        $request->session()->regenerateToken();
+
+        return redirect()->route('welcome')->with('message', 'Déconnexion réussie.');
     }
 }
