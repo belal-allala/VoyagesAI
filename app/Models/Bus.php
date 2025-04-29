@@ -4,38 +4,25 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Bus extends Model
 {
     use HasFactory;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
-        'name',  //Ajouter l'attribut name
+        'name',
+        'company_id',
         'capacity',
-        'available_seats',
-        'company_id', // <-- et ajoute la clefs secondaire comme fillables
+        'plate_number'
     ];
 
-    /**
-     * Get the company that owns the bus.
-     */
-    public function company(): BelongsTo
+    // Relations
+    public function compagnie()
     {
-        return $this->belongsTo(Company::class);
+        return $this->belongsTo(Compagnie::class);
     }
 
-
-     /**
-     * Get the trajets for the bus.
-     */
-    public function trajets(): HasMany
+    public function trajets()
     {
         return $this->hasMany(Trajet::class);
     }

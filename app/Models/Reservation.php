@@ -4,41 +4,40 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo; // Importez BelongsTo
 
 class Reservation extends Model
 {
     use HasFactory;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
-        'bus_id',
-        'user_id', 
-        'passenger_name',
-        'passenger_email',
-        'seat_count',
-        'total_price',
-        'reservation_date',
+        'user_id',
+        'sous_trajet_id',
+        'date_depart',
+        'ville_depart',
+        'date_arrivee',
+        'ville_arrivee',
         'status',
+        'note'
     ];
 
-    /**
-     * Get the bus that this reservation is for.
-     */
-    public function bus(): BelongsTo
+    protected $casts = [
+        'date_depart' => 'datetime',
+        'date_arrivee' => 'datetime'
+    ];
+
+    // Relations
+    public function user()
     {
-        return $this->belongsTo(Bus::class);
+        return $this->belongsTo(User::class);
     }
 
-    /**
-     * Get the user that made this reservation.
-     */
-    public function user(): BelongsTo
+    public function sousTrajet()
     {
-        return $this->belongsTo(User::class); 
+        return $this->belongsTo(SousTrajet::class);
+    }
+
+    public function billet()
+    {
+        return $this->hasOne(Billet::class);
     }
 }

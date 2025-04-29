@@ -4,35 +4,29 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Trajet extends Model
 {
     use HasFactory;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
-        'bus_id',
         'name',
+        'bus_id',
+        'chauffeur_id'
     ];
 
-    /**
-     * Get the bus that this trajet belongs to.
-     */
-    public function bus(): BelongsTo
+    // Relations
+    public function bus()
     {
         return $this->belongsTo(Bus::class);
     }
 
-    /**
-     * Get the sous-trajets for the trajet.
-     */
-    public function sousTrajets(): HasMany
+    public function chauffeur()
+    {
+        return $this->belongsTo(User::class, 'chauffeur_id');
+    }
+
+    public function sousTrajets()
     {
         return $this->hasMany(SousTrajet::class);
     }

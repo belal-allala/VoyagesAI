@@ -34,9 +34,10 @@
 
         <div class="mb-4">
             <label for="role" class="block text-gray-700 text-sm font-bold mb-2">Rôle:</label>
-            <select id="role" name="role" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                <option value="voyageur" selected>Voyageur</option>
-                <option value="compagn" selected>compagn</option>
+            <select id="role" name="role" class="...">
+                <option value="voyageur">Voyageur</option>
+                <option value="employe">Employé</option>
+                <option value="chauffeur">Chauffeur</option>
             </select>
             @error('role') <p class="text-red-500 text-xs italic">{{ $message }}</p> @enderror
         </div>

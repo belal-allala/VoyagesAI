@@ -11,12 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('bus_locations', function (Blueprint $table) {
+        Schema::create('buses', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('bus_id')->constrained('buses');
-            $table->decimal('latitude', 10, 7);
-            $table->decimal('longitude', 10, 7);
-            $table->timestamp('timestamp');
+            $table->string('name');
+            $table->foreignId('company_id')->constrained('compagnies')->onDelete('cascade');
+            $table->integer('capacity');
+            $table->string('plate_number')->unique();
             $table->timestamps();
         });
     }
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('bus_locations');
+        Schema::dropIfExists('buses');
     }
 };

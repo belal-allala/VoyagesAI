@@ -13,12 +13,12 @@ return new class extends Migration
     {
         Schema::create('sous_trajets', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('trajet_id');
+            $table->foreignId('trajet_id')->constrained('trajets')->onDelete('cascade');
             $table->string('departure_city');
             $table->dateTime('departure_time');
             $table->string('destination_city');
             $table->dateTime('arrival_time');
-            $table->decimal('price', 8, 2); 
+            $table->decimal('price', 8, 2);
             $table->timestamps();
         });
     }

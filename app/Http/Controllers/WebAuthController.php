@@ -28,14 +28,21 @@ class WebAuthController extends Controller
      *
      * @param  \App\Http\Requests\RegisterRequest  $request  //Request de validation
      */
-    public function handleRegister(RegisterRequest $request)  // On utilise la bonne request
+    public function handleRegister(RegisterRequest $request)
     {
-        $user = User::create([
-            'name' => $request->validated('name'),
+        $data = [
+            'nom' => $request->name, 
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role' => $request->role,
-        ]);
+        ];
+
+        // // Si c'est un employé, on peut associer une compagnie
+        // if ($request->role === 'employe' && $request->has('company_id')) {
+        //     $data['company_id'] = $request->company_id;
+        // }
+
+        User::create($data);
 
         return redirect()->route('welcome')->with('message', 'Compte créé avec succès. Veuillez vous connecter.');
     }
