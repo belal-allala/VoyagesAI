@@ -59,6 +59,9 @@ Route::middleware(['auth', 'role:employe'])->group(function () {
     Route::get('/buses', [BusController::class, 'index'])->name('buses.index');
     Route::get('/buses/create', [BusController::class, 'create'])->name('buses.create');
     Route::post('/buses', [BusController::class, 'store'])->name('buses.store');
+    Route::get('/buses/{bus}/edit', [BusController::class, 'edit'])->name('buses.edit');
+    Route::put('/buses/{bus}', [BusController::class, 'update'])->name('buses.update');
+    Route::delete('/buses/{bus}', [BusController::class, 'destroy'])->name('buses.destroy');
     
     // Gestion Trajets
     Route::get('/trajets/create', [TrajetController::class, 'create'])->name('trajets.create');

@@ -51,19 +51,47 @@ class BusController extends Controller
     }
 
 
-    // public function store(Request $request)
-    // {
-    //     $validated = $request->validate([
-    //         'name' => 'required|string',
-    //         'capacity' => 'required|integer',
-    //         'plate_number' => 'required|unique:buses'
-    //     ]);
+    public function edit(Bus $bus)
+    {
+        if ($bus->company_id !== auth()->user()->company_id) {
+            abort(403, 'Accès non autorisé');
+        }
 
-    //     Bus::create($validated + [
-    //         'company_id' => auth()->user()->company_id
-    //     ]);
+        return view('employe.buses.edit', compact('bus'));
+    }
 
-    //     return redirect()->route('buses.create')
-    //                     ->with('success', 'Bus ajouté avec succès!');
-    // }
+    public function update(Request $request, Bus $bus)
+    {
+        if ($bus->company_id !== auth()->user()->company_id) {
+            abort(403, 'Accès non autorisé');
+        }
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'capacity' => 'required|integer|min:1',
+            'plate_number' => 'required|string|unique:buses,plate_number,'.$bus->id
+        ]);
+
+        $bus->update($validated);
+
+        return redirect()->route('buses.index')
+                         ->with('success', 'Bus mis à jour avec succès!');
+    }
+
+    public function destroy(Bus $bus)
+    {
+        if ($bus->company_id !== auth()->user()->company_id) {
+            abort(403, 'Accès non autorisé');
+        }
+
+        if ($bus->trajets()->exists()) {
+            return redirect()->back()
+                             ->with('error', 'Ce bus est utilisé dans des trajets et ne peut être supprimé');
+        }
+
+        $bus->delete();
+
+        return redirect()->route('buses.index')
+                         ->with('success', 'Bus supprimé avec succès!');
+    }
 }
