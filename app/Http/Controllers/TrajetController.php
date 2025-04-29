@@ -94,4 +94,65 @@ class TrajetController extends Controller
         return redirect()->route('trajets.index')
                          ->with('success', 'Trajet supprimé');
     }
+
+    public function edit(Trajet $trajet)
+    {
+        if ($trajet->bus->company_id !== auth()->user()->company_id) {
+            abort(403, 'Action non autorisée');
+        }
+
+        $buses = Bus::where('company_id', auth()->user()->company_id)->get();
+        $chauffeurs = User::where('role', 'chauffeur')
+                        ->where('company_id', auth()->user()->company_id)
+                        ->get();
+
+        return view('employe.trajets.edit', compact('trajet', 'buses', 'chauffeurs'));
+    }
+
+    public function update(Request $request, Trajet $trajet)
+    {
+        if ($trajet->bus->company_id !== auth()->user()->company_id) {
+            abort(403, 'Action non autorisée');
+        }
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'bus_id' => 'required|exists:buses,id',
+            'chauffeur_id' => 'required|exists:users,id',
+            'sous_trajets' => 'required|array|min:1',
+            'sous_trajets.*.id' => 'sometimes|exists:sous_trajets,id', // Pour les étapes existantes
+            'sous_trajets.*.departure_city' => 'required|string',
+            'sous_trajets.*.destination_city' => 'required|string',
+            'sous_trajets.*.departure_time' => 'required|date',
+            'sous_trajets.*.arrival_time' => 'required|date|after:sous_trajets.*.departure_time',
+            'sous_trajets.*.price' => 'required|numeric|min:0'
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $trajet->update([
+                'name' => $validated['name'],
+                'bus_id' => $validated['bus_id'],
+                'chauffeur_id' => $validated['chauffeur_id']
+            ]);
+
+            foreach ($validated['sous_trajets'] as $sousTrajetData) {
+                if (isset($sousTrajetData['id'])) {
+                    $sousTrajet = SousTrajet::find($sousTrajetData['id']);
+                    $sousTrajet->update($sousTrajetData);
+                } else {
+                    $trajet->sousTrajets()->create($sousTrajetData);
+                }
+            }
+
+            DB::commit();
+            
+            return redirect()->route('trajets.index')
+                            ->with('success', 'Trajet mis à jour avec succès');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->withInput()
+                        ->with('error', 'Erreur lors de la mise à jour: ' . $e->getMessage());
+        }
+    }
 }
