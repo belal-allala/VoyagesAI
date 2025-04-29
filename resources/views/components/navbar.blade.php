@@ -66,7 +66,7 @@
                     @if(auth()->user()->compagnie)
                         <a href="{{ route('buses.index') }}" class="mr-4 rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-800 hover:text-white transition-colors">Gestion des Bus</a>
                         <a href="{{ route('chauffeurs.index') }}" class="mr-4 rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-800 hover:text-white transition-colors">Gestion des chauffeur</a>
-                        <a href="{{ route('trajets.create') }}" class="mr-4 rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-800 hover:text-white transition-colors">Gestion des Trajets</a>
+                        <a href="{{ route('trajets.index') }}" class="mr-4 rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-800 hover:text-white transition-colors">Gestion des Trajets</a>
                     @endif
                 </div>
             </div>
