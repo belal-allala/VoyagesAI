@@ -3,6 +3,10 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\WebAuthController;
 use App\Http\Controllers\BusController;
+use App\Http\Controllers\CompagnieController;
+use App\Http\Controllers\EmployeController;
+use App\Http\Controllers\TrajetController;
+use App\Http\Controllers\SousTrajetController;
 
 /*
 |--------------------------------------------------------------------------
@@ -52,6 +56,7 @@ Route::middleware(['auth', 'role:employe'])->group(function () {
     Route::post('/compagnies', [CompagnieController::class, 'store'])->name('compagnies.store');
     
     // Gestion Bus
+    Route::get('/buses', [BusController::class, 'index'])->name('buses.index');
     Route::get('/buses/create', [BusController::class, 'create'])->name('buses.create');
     Route::post('/buses', [BusController::class, 'store'])->name('buses.store');
     
@@ -63,3 +68,5 @@ Route::middleware(['auth', 'role:employe'])->group(function () {
     Route::get('/trajets/{trajet}/sous-trajets/create', [SousTrajetController::class, 'create'])->name('sous-trajets.create');
     Route::post('/trajets/{trajet}/sous-trajets', [SousTrajetController::class, 'store'])->name('sous-trajets.store');
 });
+
+Route::get('/employe/dashboard', [EmployeController::class, 'dashboard'])->name('employe.dashboard');

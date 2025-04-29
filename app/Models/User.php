@@ -12,6 +12,12 @@ use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\Compagnie;
+use App\Models\Trajet;
+use App\Models\Reservation;
+use App\Models\Notification;
+use App\Models\Bus;
+use App\Models\SousTrajet;
 
 class User extends Authenticatable
 {
@@ -53,5 +59,10 @@ class User extends Authenticatable
     public function notifications()
     {
         return $this->hasMany(Notification::class);
+    }
+
+    public function hasRole($role)
+    {
+        return $this->role === $role;
     }
 }

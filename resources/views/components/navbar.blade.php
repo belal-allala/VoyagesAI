@@ -13,7 +13,20 @@
                             <button type="submit" class="hover:text-gray-700">Déconnexion</button>
                         </form>
                     </li> 
-                    
+
+                    @if(auth()->user()->role === 'employe')
+                        <div class="bg-gray-800 text-white p-4">
+                            <div class="container mx-auto">
+                                <nav class="flex space-x-4">
+                                    <a href="{{ route('employe.dashboard') }}" class="hover:bg-gray-700 px-3 py-2 rounded">Tableau de bord</a>
+                                    @if(auth()->user()->compagnie)
+                                        <a href="{{ route('buses.index') }}" class="hover:bg-gray-700 px-3 py-2 rounded">Gestion des Bus</a>
+                                        <a href="{{ route('trajets.create') }}" class="hover:bg-gray-700 px-3 py-2 rounded">Gestion des Trajets</a>
+                                    @endif
+                                </nav>
+                            </div>
+                        </div>
+                    @endif                   
                 @else
                     <li><a href="{{ route('login') }}" class="hover:text-gray-700">Connexion</a></li>
                     <li><a href="{{ route('register') }}" class="hover:text-gray-700">Inscription</a></li>

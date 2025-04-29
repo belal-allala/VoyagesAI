@@ -9,7 +9,7 @@ class CompagnieController extends Controller
 {
     public function create()
     {
-        return view('employe.compagnies.create');
+        return view('employe.create');
     }
 
     public function store(Request $request)
@@ -24,7 +24,7 @@ class CompagnieController extends Controller
         // Associer l'employé à la compagnie
         auth()->user()->update(['company_id' => $compagnie->id]);
 
-        return redirect()->route('compagnies.create')
+        return redirect()->route('employe.dashboard')
                         ->with('success', 'Compagnie créée avec succès!');
     }
 }
