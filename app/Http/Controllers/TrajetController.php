@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\SousTrajet;
 use App\Http\Controllers\SousTrajetController;
+use App\Services\RecurringTrajetService;
 
 class TrajetController extends Controller
 {
@@ -29,7 +30,7 @@ class TrajetController extends Controller
         return view('employe.trajets.index', compact('trajets', 'buses', 'chauffeurs'));
     }
 
-    public function store(Request $request)
+    public function store(Request $request, RecurringTrajetService $recurringService)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -38,8 +39,8 @@ class TrajetController extends Controller
                 'exists:buses,id',
                 function ($attr, $value, $fail) {
                     if (!Bus::where('id', $value)
-                          ->where('company_id', auth()->user()->company_id)
-                          ->exists()) {
+                        ->where('company_id', auth()->user()->company_id)
+                        ->exists()) {
                         $fail('Ce bus ne fait pas partie de votre compagnie');
                     }
                 }
@@ -59,7 +60,13 @@ class TrajetController extends Controller
             'sous_trajets.*.destination_city' => 'required|string|max:100',
             'sous_trajets.*.departure_time' => 'required|date',
             'sous_trajets.*.arrival_time' => 'required|date|after:sous_trajets.*.departure_time',
-            'sous_trajets.*.price' => 'required|numeric|min:0|max:10000'
+            'sous_trajets.*.price' => 'required|numeric|min:0|max:10000',
+            'recurring_type' => 'nullable|in:daily,weekly,monthly,custom',
+            'recurring_interval' => 'nullable|integer|min:1|required_if:recurring_type,daily,weekly,monthly,custom',
+            'days_of_week' => 'nullable|array|required_if:recurring_type,weekly',
+            'days_of_week.*' => 'integer|min:1|max:7',
+            'start_date' => 'nullable|date|required_if:recurring_type,daily,weekly,monthly,custom',
+            'end_date' => 'nullable|date|after:start_date'
         ]);
 
         DB::beginTransaction();
@@ -67,21 +74,38 @@ class TrajetController extends Controller
             $trajet = Trajet::create([
                 'name' => $validated['name'],
                 'bus_id' => $validated['bus_id'],
-                'chauffeur_id' => $validated['chauffeur_id']
+                'chauffeur_id' => $validated['chauffeur_id'],
+                'is_recurring' => isset($validated['recurring_type'])
             ]);
 
             foreach ($validated['sous_trajets'] as $sousTrajet) {
                 $trajet->sousTrajets()->create($sousTrajet);
             }
 
+            // Gestion de la récurrence si activée
+            if (isset($validated['recurring_type'])) {
+                $patternData = [
+                    'type' => $validated['recurring_type'],
+                    'interval' => $validated['recurring_interval'],
+                    'days_of_week' => $validated['days_of_week'] ?? null,
+                    'start_date' => $validated['start_date'],
+                    'end_date' => $validated['end_date'] ?? null
+                ];
+
+                $pattern = $trajet->recurringPattern()->create($patternData);
+                
+                // Génération des occurrences pour les 60 prochains jours
+                $recurringService->generateTrajetsForPattern($pattern, 60);
+            }
+
             DB::commit();
             
             return redirect()->route('trajets.index')
-                             ->with('success', 'Trajet créé avec succès');
+                            ->with('success', 'Trajet créé avec succès');
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->withInput()
-                         ->with('error', 'Erreur: ' . $e->getMessage());
+                        ->with('error', 'Erreur: ' . $e->getMessage());
         }
     }
 
@@ -156,5 +180,15 @@ class TrajetController extends Controller
             return back()->withInput()
                         ->with('error', 'Erreur lors de la mise à jour: ' . $e->getMessage());
         }
+    }
+
+    public function recurringPattern()
+    {
+        return $this->hasOne(RecurringPattern::class);
+    }
+
+    public function isRecurring()
+    {
+        return $this->recurringPattern !== null;
     }
 }
