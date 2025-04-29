@@ -9,11 +9,15 @@ class SousTrajet extends Model
 {
     use HasFactory;
 
+    protected $table = 'sous_trajets';
+    
     protected $fillable = [
         'trajet_id',
         'departure_city',
         'destination_city',
-        'price'
+        'departure_time',
+        'arrival_time',
+        'price',
     ];
 
     protected $casts = [

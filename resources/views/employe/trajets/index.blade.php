@@ -69,6 +69,58 @@
                 <div id="sousTrajetsContainer" class="space-y-4 mb-4">
                     <!-- Étapes seront ajoutées ici -->
                 </div>
+
+                <!-- Section Récurrence -->
+                <div class="mb-6 p-4 border rounded-lg">
+                    <h3 class="text-lg font-semibold mb-3">Options de récurrence</h3>
+                    
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Type de récurrence</label>
+                        <select name="recurring_type" id="recurringType" 
+                                class="w-full px-3 py-2 border rounded">
+                            <option value="">Aucune récurrence</option>
+                            <option value="daily">Quotidien</option>
+                            <option value="weekly">Hebdomadaire</option>
+                            <option value="monthly">Mensuel</option>
+                            <option value="custom">Personnalisé</option>
+                        </select>
+                    </div>
+                    
+                    <div id="recurringOptions" class="hidden space-y-4">
+                        <div>
+                            <label class="block text-gray-700 text-sm font-bold mb-2">Intervalle</label>
+                            <input type="number" name="recurring_interval" min="1" value="1" 
+                                   class="w-full px-3 py-2 border rounded">
+                            <p class="text-xs text-gray-500 mt-1">Ex: 2 = Tous les 2 jours/semaines/mois</p>
+                        </div>
+                        
+                        <div id="weeklyOptions" class="hidden">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">Jours de la semaine</label>
+                            <div class="grid grid-cols-7 gap-2">
+                                @foreach(['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'] as $index => $day)
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="days_of_week[]" value="{{ $index + 1 }}" class="mr-2">
+                                    {{ $day }}
+                                </label>
+                                @endforeach
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-gray-700 text-sm font-bold mb-2">Date de début*</label>
+                                <input type="date" name="start_date" min="{{ date('Y-m-d') }}" 
+                                       class="w-full px-3 py-2 border rounded">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-gray-700 text-sm font-bold mb-2">Date de fin (optionnel)</label>
+                                <input type="date" name="end_date" 
+                                       class="w-full px-3 py-2 border rounded">
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 
                 <div class="flex items-center justify-between">
                     <button type="button" id="addSousTrajet"
@@ -99,6 +151,7 @@
                                 <th class="py-3 px-4 text-left">Bus</th>
                                 <th class="py-3 px-4 text-left">Chauffeur</th>
                                 <th class="py-3 px-4 text-left">Étapes</th>
+                                <th class="py-3 px-4 text-left">Récurrence</th>
                                 <th class="py-3 px-4 text-left">Actions</th>
                             </tr>
                         </thead>
@@ -118,6 +171,18 @@
                                         </li>
                                         @endforeach
                                     </ul>
+                                </td>
+                                <td class="py-3 px-4">
+                                    @if($trajet->is_recurring)
+                                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                            <svg class="h-3 w-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                            </svg>
+                                            {{ $trajet->recurringPattern->recurrence_description }}
+                                        </span>
+                                    @else
+                                        <span class="text-gray-500">Ponctuel</span>
+                                    @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                     <div class="flex space-x-2">
@@ -148,81 +213,90 @@
     </div>
 </div>
 
-
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Document loaded'); 
-    
+    // Gestion des sous-trajets
     const container = document.getElementById('sousTrajetsContainer');
     const addButton = document.getElementById('addSousTrajet');
     
-    if (!container || !addButton) {
-        console.error('Elements not found!');
-        return;
+    if (container && addButton) {
+        let stepCount = container.querySelectorAll('.sousTrajet').length;
+        
+        function addSousTrajet() {
+            const index = stepCount++;
+            const html = `
+            <div class="sousTrajet p-4 border rounded-lg bg-white mb-4">
+                <div class="flex justify-between items-center mb-2">
+                    <h3 class="font-medium">Étape ${index + 1}</h3>
+                    <button type="button" class="removeStep text-red-500 hover:text-red-700">
+                        × Supprimer
+                    </button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Ville de départ*</label>
+                        <input type="text" name="sous_trajets[${index}][departure_city]" required
+                               class="w-full px-3 py-2 border rounded">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Ville d'arrivée*</label>
+                        <input type="text" name="sous_trajets[${index}][destination_city]" required
+                               class="w-full px-3 py-2 border rounded">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Heure de départ*</label>
+                        <input type="datetime-local" name="sous_trajets[${index}][departure_time]" required
+                               class="w-full px-3 py-2 border rounded" >
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Heure d'arrivée*</label>
+                        <input type="datetime-local" name="sous_trajets[${index}][arrival_time]" required
+                               class="w-full px-3 py-2 border rounded" ">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Prix (MAD)*</label>
+                        <input type="number" step="0.01" min="0" 
+                               name="sous_trajets[${index}][price]" required
+                               class="w-full px-3 py-2 border rounded">
+                    </div>
+                </div>
+            </div>`;
+            
+            container.insertAdjacentHTML('beforeend', html);
+        }
+        
+        addButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            addSousTrajet();
+        });
+        
+        container.addEventListener('click', function(e) {
+            if (e.target.classList.contains('removeStep')) {
+                e.preventDefault();
+                e.target.closest('.sousTrajet').remove();
+                stepCount--;
+            }
+        });
+        
+        if (stepCount === 0) {
+            addSousTrajet();
+        }
     }
 
-    let stepCount = container.querySelectorAll('.sousTrajet').length;
-    
-    function addSousTrajet() {
-        const index = stepCount++;
-        const html = `
-        <div class="sousTrajet p-4 border rounded-lg bg-white mb-4">
-            <div class="flex justify-between items-center mb-2">
-                <h3 class="font-medium">Étape ${index + 1}</h3>
-                <button type="button" class="removeStep text-red-500 hover:text-red-700">
-                    × Supprimer
-                </button>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Ville de départ*</label>
-                    <input type="text" name="sous_trajets[${index}][departure_city]" required
-                           class="w-full px-3 py-2 border rounded">
-                </div>
-                <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Ville d'arrivée*</label>
-                    <input type="text" name="sous_trajets[${index}][destination_city]" required
-                           class="w-full px-3 py-2 border rounded">
-                </div>
-                <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Heure de départ*</label>
-                    <input type="datetime-local" name="sous_trajets[${index}][departure_time]" required
-                           class="w-full px-3 py-2 border rounded">
-                </div>
-                <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Heure d'arrivée*</label>
-                    <input type="datetime-local" name="sous_trajets[${index}][arrival_time]" required
-                           class="w-full px-3 py-2 border rounded">
-                </div>
-                <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Prix (MAD)*</label>
-                    <input type="number" step="0.01" min="0" 
-                           name="sous_trajets[${index}][price]" required
-                           class="w-full px-3 py-2 border rounded">
-                </div>
-            </div>
-        </div>`;
-        
-        container.insertAdjacentHTML('beforeend', html);
-    }
-    
-    // Gestion des événements
-    addButton.addEventListener('click', function(e) {
-        e.preventDefault();
-        addSousTrajet();
-    });
-    
-    container.addEventListener('click', function(e) {
-        if (e.target.classList.contains('removeStep')) {
-            e.preventDefault();
-            e.target.closest('.sousTrajet').remove();
-            stepCount--;
-        }
-    });
-    
-    // Ajouter un premier sous-trajet par défaut
-    if (stepCount === 0) {
-        addSousTrajet();
+    // Gestion des options de récurrence
+    const recurringType = document.getElementById('recurringType');
+    if (recurringType) {
+        recurringType.addEventListener('change', function() {
+            const recurringOptions = document.getElementById('recurringOptions');
+            const weeklyOptions = document.getElementById('weeklyOptions');
+            
+            if (this.value) {
+                recurringOptions.classList.remove('hidden');
+                weeklyOptions.classList.toggle('hidden', this.value !== 'weekly');
+            } else {
+                recurringOptions.classList.add('hidden');
+            }
+        });
     }
 });
 </script>

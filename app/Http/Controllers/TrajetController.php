@@ -10,6 +10,9 @@ use Illuminate\Support\Facades\DB;
 use App\Models\SousTrajet;
 use App\Http\Controllers\SousTrajetController;
 use App\Services\RecurringTrajetService;
+use Carbon\Carbon;
+use App\Models\RecurringPattern;
+
 
 class TrajetController extends Controller
 {
@@ -58,8 +61,8 @@ class TrajetController extends Controller
             'sous_trajets' => 'required|array|min:1',
             'sous_trajets.*.departure_city' => 'required|string|max:100',
             'sous_trajets.*.destination_city' => 'required|string|max:100',
-            'sous_trajets.*.departure_time' => 'required|date',
-            'sous_trajets.*.arrival_time' => 'required|date|after:sous_trajets.*.departure_time',
+            'sous_trajets.*.departure_time' => 'required|date_format:Y-m-d\TH:i',
+            'sous_trajets.*.arrival_time' => 'required|date_format:Y-m-d\TH:i|after:sous_trajets.*.departure_time',
             'sous_trajets.*.price' => 'required|numeric|min:0|max:10000',
             'recurring_type' => 'nullable|in:daily,weekly,monthly,custom',
             'recurring_interval' => 'nullable|integer|min:1|required_if:recurring_type,daily,weekly,monthly,custom',
@@ -70,7 +73,7 @@ class TrajetController extends Controller
         ]);
 
         DB::beginTransaction();
-        try {
+        // try {
             $trajet = Trajet::create([
                 'name' => $validated['name'],
                 'bus_id' => $validated['bus_id'],
@@ -79,7 +82,18 @@ class TrajetController extends Controller
             ]);
 
             foreach ($validated['sous_trajets'] as $sousTrajet) {
-                $trajet->sousTrajets()->create($sousTrajet);
+                // Assurez-vous que les dates sont correctement formatées
+                $departureTime = Carbon::createFromFormat('Y-m-d\TH:i', $sousTrajet['departure_time']);
+                $arrivalTime = Carbon::createFromFormat('Y-m-d\TH:i', $sousTrajet['arrival_time']);
+                
+                // Création explicite avec tous les champs
+                $trajet->sousTrajets()->create([
+                    'departure_city' => $sousTrajet['departure_city'],
+                    'destination_city' => $sousTrajet['destination_city'],
+                    'departure_time' => $departureTime,
+                    'arrival_time' => $arrivalTime,
+                    'price' => $sousTrajet['price']
+                ]);
             }
 
             // Gestion de la récurrence si activée
@@ -92,7 +106,7 @@ class TrajetController extends Controller
                     'end_date' => $validated['end_date'] ?? null
                 ];
 
-                $pattern = $trajet->recurringPattern()->create($patternData);
+            $pattern = $trajet->recurringPattern()->create($patternData);
                 
                 // Génération des occurrences pour les 60 prochains jours
                 $recurringService->generateTrajetsForPattern($pattern, 60);
@@ -102,11 +116,11 @@ class TrajetController extends Controller
             
             return redirect()->route('trajets.index')
                             ->with('success', 'Trajet créé avec succès');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return back()->withInput()
-                        ->with('error', 'Erreur: ' . $e->getMessage());
-        }
+        // } catch (\Exception $e) {
+        //     DB::rollBack();
+        //     return back()->withInput()
+        //                 ->with('error', 'Erreur: ' . $e->getMessage());
+        // }
     }
 
     public function destroy(Trajet $trajet)

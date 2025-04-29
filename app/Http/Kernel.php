@@ -69,8 +69,5 @@ class Kernel extends HttpKernel
         'checkRoleEmploye' => \App\Http\Middleware\CheckEmployeRole::class,
     ];
 
-    protected function schedule(Schedule $schedule)
-    {
-        $schedule->command('trajets:generate-recurring')->dailyAt('03:00');
-    }
+    
 }

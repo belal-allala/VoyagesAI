@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\RecurringPattern;
 
 class Trajet extends Model
 {
@@ -12,7 +13,8 @@ class Trajet extends Model
     protected $fillable = [
         'name',
         'bus_id',
-        'chauffeur_id'
+        'chauffeur_id',
+        'is_recurring',
     ];
 
     // Relations
@@ -29,5 +31,10 @@ class Trajet extends Model
     public function sousTrajets()
     {
         return $this->hasMany(SousTrajet::class);
+    }
+
+    public function recurringPattern()
+    {
+        return $this->hasOne(RecurringPattern::class);
     }
 }

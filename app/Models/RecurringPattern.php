@@ -82,4 +82,5 @@ class RecurringPattern extends Model
         }
         return $daysDiff % $this->interval === 0;
     }
+
 }
