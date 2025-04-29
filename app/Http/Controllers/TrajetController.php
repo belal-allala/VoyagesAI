@@ -11,7 +11,17 @@ use App\Models\Trajet;
 
 class TrajetController extends Controller
 {
-
+    public function index()
+    {
+        $trajets = Trajet::with(['bus', 'chauffeur', 'sousTrajets'])
+                        ->whereHas('bus', function($q) {
+                            $q->where('company_id', auth()->user()->company_id);
+                        })
+                        ->get();
+        
+        return view('employe.trajets.index', compact('trajets'));
+    }
+    
     public function create()
     {
         $buses = Bus::where('company_id', auth()->user()->company_id)->get();

@@ -64,12 +64,37 @@ Route::middleware(['auth', 'role:employe'])->group(function () {
     Route::delete('/buses/{bus}', [BusController::class, 'destroy'])->name('buses.destroy');
     
     // Gestion Trajets
-    Route::get('/trajets/create', [TrajetController::class, 'create'])->name('trajets.create');
-    Route::post('/trajets', [TrajetController::class, 'store'])->name('trajets.store');
+    Route::prefix('trajets')->group(function () {
+        // Liste des trajets
+        Route::get('/', [TrajetController::class, 'index'])->name('trajets.index');
+        
+        // Création de trajet
+        Route::get('/create', [TrajetController::class, 'create'])->name('trajets.create');
+        Route::post('/', [TrajetController::class, 'store'])->name('trajets.store');
+        
+        // Visualisation détaillée
+        Route::get('/{trajet}', [TrajetController::class, 'show'])->name('trajets.show');
+        
+        // Modification
+        Route::get('/{trajet}/edit', [TrajetController::class, 'edit'])->name('trajets.edit');
+        Route::put('/{trajet}', [TrajetController::class, 'update'])->name('trajets.update');
+        
+        // Suppression
+        Route::delete('/{trajet}', [TrajetController::class, 'destroy'])->name('trajets.destroy');
+        
+        // Gestion des sous-trajets (optionnel)
+        Route::post('/{trajet}/sous-trajets', [TrajetController::class, 'addSousTrajet'])->name('trajets.sous-trajets.store');
+        Route::delete('/sous-trajets/{sousTrajet}', [TrajetController::class, 'removeSousTrajet'])->name('trajets.sous-trajets.destroy');
+    });
     
     // Gestion Sous-trajets
     Route::get('/trajets/{trajet}/sous-trajets/create', [SousTrajetController::class, 'create'])->name('sous-trajets.create');
     Route::post('/trajets/{trajet}/sous-trajets', [SousTrajetController::class, 'store'])->name('sous-trajets.store');
+
+    Route::prefix('chauffeurs')->group(function () {
+        Route::get('/search', [ChauffeurController::class, 'search'])->name('chauffeurs.search');
+        Route::post('/{user}/attach', [ChauffeurController::class, 'attach'])->name('chauffeurs.attach');
+    });
 });
 
 Route::get('/employe/dashboard', [EmployeController::class, 'dashboard'])->name('employe.dashboard');
