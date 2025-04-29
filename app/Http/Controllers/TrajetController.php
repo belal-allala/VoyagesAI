@@ -7,6 +7,8 @@ use App\Models\Bus;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\SousTrajet;
+use App\Http\Controllers\SousTrajetController;
 
 class TrajetController extends Controller
 {

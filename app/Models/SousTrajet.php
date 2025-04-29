@@ -12,10 +12,13 @@ class SousTrajet extends Model
     protected $fillable = [
         'trajet_id',
         'departure_city',
-        'departure_time',
         'destination_city',
-        'arrival_time',
         'price'
+    ];
+
+    protected $casts = [
+        'departure_time' => 'datetime',
+        'arrival_time' => 'datetime',
     ];
 
     // Relations
