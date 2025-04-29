@@ -67,12 +67,10 @@ Route::middleware(['auth', 'role:employe'])->group(function () {
     // Gestion Trajets
     Route::prefix('trajets')->group(function () {
         Route::get('/', [TrajetController::class, 'index'])->name('trajets.index');
-        
-        // POST /trajets - Enregistrement nouveau trajet (store)
         Route::post('/', [TrajetController::class, 'store'])->name('trajets.store');
-        
-        // DELETE /trajets/{trajet} - Suppression trajet (destroy)
         Route::delete('/{trajet}', [TrajetController::class, 'destroy'])->name('trajets.destroy');
+        Route::get('/trajets/{trajet}/edit', [TrajetController::class, 'edit'])->name('trajets.edit');
+        Route::put('/trajets/{trajet}', [TrajetController::class, 'update'])->name('trajets.update');
     });
     // Gestion Sous-trajets
     Route::get('/trajets/{trajet}/sous-trajets/create', [SousTrajetController::class, 'create'])->name('sous-trajets.create');

@@ -120,7 +120,6 @@
     </div>
 </div>
 
-@push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const container = document.getElementById('sousTrajetsContainer');
@@ -182,5 +181,4 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-@endpush
 @endsection
