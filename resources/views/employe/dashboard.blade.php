@@ -76,7 +76,7 @@
                         </div>
                     </div>
                     <div class="px-6 py-5 flex flex-col items-center">
-                        <p class="text-4xl font-bold text-purple-600">{{ $chauffeurs ?? 0 }}</p>
+                        <p class="text-4xl font-bold text-purple-600">{{ $chauffeurs }}</p>
                         <p class="text-sm text-gray-500 mb-4">Chauffeurs actifs</p>
                         <a href="{{  '#' }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 mr-2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>

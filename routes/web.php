@@ -7,6 +7,7 @@ use App\Http\Controllers\CompagnieController;
 use App\Http\Controllers\EmployeController;
 use App\Http\Controllers\TrajetController;
 use App\Http\Controllers\SousTrajetController;
+use App\Http\Controllers\ChauffeurController;
 
 /*
 |--------------------------------------------------------------------------
@@ -92,8 +93,10 @@ Route::middleware(['auth', 'role:employe'])->group(function () {
     Route::post('/trajets/{trajet}/sous-trajets', [SousTrajetController::class, 'store'])->name('sous-trajets.store');
 
     Route::prefix('chauffeurs')->group(function () {
+        Route::get('/', [ChauffeurController::class, 'index'])->name('chauffeurs.index');
         Route::get('/search', [ChauffeurController::class, 'search'])->name('chauffeurs.search');
         Route::post('/{user}/attach', [ChauffeurController::class, 'attach'])->name('chauffeurs.attach');
+        Route::delete('/{user}/detach', [ChauffeurController::class, 'detach'])->name('chauffeurs.detach');
     });
 });
 
