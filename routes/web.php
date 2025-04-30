@@ -71,6 +71,7 @@ Route::middleware(['auth', 'role:employe'])->group(function () {
         Route::delete('/{trajet}', [TrajetController::class, 'destroy'])->name('trajets.destroy');
         Route::get('/trajets/{trajet}/edit', [TrajetController::class, 'edit'])->name('trajets.edit');
         Route::put('/trajets/{trajet}', [TrajetController::class, 'update'])->name('trajets.update');
+        Route::get('/{trajet}/details', [TrajetController::class, 'details'])->name('trajets.details');
     });
     // Gestion Sous-trajets
     Route::get('/trajets/{trajet}/sous-trajets/create', [SousTrajetController::class, 'create'])->name('sous-trajets.create');

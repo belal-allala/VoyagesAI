@@ -16,21 +16,44 @@ use App\Models\RecurringPattern;
 
 class TrajetController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $companyId = auth()->user()->company_id;
+        $filterDate = $request->input('date', now()->format('Y-m-d'));
         
-        $trajets = Trajet::with(['bus', 'chauffeur', 'sousTrajets'])
-                        ->whereHas('bus', fn($q) => $q->where('company_id', $companyId))
-                        ->latest()
-                        ->get();
+        // Trajets ponctuels pour la date sélectionnée
+        $trajetsPonctuels = Trajet::with(['bus', 'chauffeur', 'sousTrajets'])
+            ->whereHas('bus', fn($q) => $q->where('company_id', $companyId))
+            ->where('is_recurring', false)
+            ->whereHas('sousTrajets', function($q) use ($filterDate) {
+                $q->whereDate('departure_time', $filterDate);
+            });
+        
+        // Trajets récurrents qui correspondent à la date
+        $trajetsRecurrents = Trajet::with(['bus', 'chauffeur', 'sousTrajets', 'recurringPattern'])
+            ->whereHas('bus', fn($q) => $q->where('company_id', $companyId))
+            ->where('is_recurring', true)
+            ->whereHas('recurringPattern', function($q) use ($filterDate) {
+                $q->where('start_date', '<=', $filterDate)
+                ->where(function($query) use ($filterDate) {
+                    $query->whereNull('end_date')
+                            ->orWhere('end_date', '>=', $filterDate);
+                });
+            })
+            ->get()
+            ->filter(function($trajet) use ($filterDate) {
+                return $trajet->recurringPattern->shouldGenerateForDate(Carbon::parse($filterDate));
+            });
+        
+        // Fusionner les résultats
+        $trajets = $trajetsPonctuels->get()->merge($trajetsRecurrents);
         
         $buses = Bus::where('company_id', $companyId)->get();
         $chauffeurs = User::where('role', 'chauffeur')
-                         ->where('company_id', $companyId)
-                         ->get();
+                        ->where('company_id', $companyId)
+                        ->get();
         
-        return view('employe.trajets.index', compact('trajets', 'buses', 'chauffeurs'));
+        return view('employe.trajets.index', compact('trajets', 'buses', 'chauffeurs', 'filterDate'));
     }
 
     public function store(Request $request, RecurringTrajetService $recurringService)
@@ -204,5 +227,39 @@ class TrajetController extends Controller
     public function isRecurring()
     {
         return $this->recurringPattern !== null;
+    }
+
+    public function details(Trajet $trajet)
+    {
+        // Vérification d'accès
+        if ($trajet->bus->company_id !== auth()->user()->company_id) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $trajet->load(['bus', 'chauffeur', 'sousTrajets', 'recurringPattern']);
+
+        return response()->json([
+            'name' => $trajet->name,
+            'bus' => [
+                'name' => $trajet->bus->name,
+                'plate_number' => $trajet->bus->plate_number,
+            ],
+            'chauffeur' => [
+                'nom' => $trajet->chauffeur->nom,
+            ],
+            'is_recurring' => $trajet->is_recurring,
+            'recurring_pattern' => $trajet->is_recurring ? [
+                'recurrence_description' => $trajet->recurringPattern->recurrence_description
+            ] : null,
+            'sous_trajets' => $trajet->sousTrajets->map(function($sousTrajet) {
+                return [
+                    'departure_city' => $sousTrajet->departure_city,
+                    'destination_city' => $sousTrajet->destination_city,
+                    'departure_time' => $sousTrajet->departure_time->format('d/m/Y H:i'),
+                    'arrival_time' => $sousTrajet->arrival_time->format('d/m/Y H:i'),
+                    'price' => $sousTrajet->price,
+                ];
+            })
+        ]);
     }
 }

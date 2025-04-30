@@ -138,7 +138,27 @@
         
         <!-- Liste des trajets -->
         <div>
-            <h2 class="text-xl font-semibold mb-4">Liste des trajets</h2>
+            <div>
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-semibold">Liste des trajets</h2>
+                    
+                    <!-- Filtre par date -->
+                    <form method="GET" action="{{ route('trajets.index') }}" class="flex items-center">
+                        <label for="date" class="mr-2 text-sm font-medium text-gray-700">Filtrer par date :</label>
+                        <input type="date" id="date" name="date" value="{{ $filterDate }}"
+                               class="px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500">
+                        <button type="submit" 
+                                class="ml-2 px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
+                            Filtrer
+                        </button>
+                        @if($filterDate !== now()->format('Y-m-d'))
+                            <a href="{{ route('trajets.index') }}" 
+                               class="ml-2 px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
+                                Aujourd'hui
+                            </a>
+                        @endif
+                    </form>
+                </div>
             
             @if($trajets->isEmpty())
                 <p class="text-gray-500">Aucun trajet enregistré</p>
@@ -147,10 +167,10 @@
                     <table class="min-w-full bg-white border">
                         <thead class="bg-gray-100">
                             <tr>
+                                <th class="py-3 px-4 text-left">Date de départ</th>
                                 <th class="py-3 px-4 text-left">Nom</th>
                                 <th class="py-3 px-4 text-left">Bus</th>
                                 <th class="py-3 px-4 text-left">Chauffeur</th>
-                                <th class="py-3 px-4 text-left">Étapes</th>
                                 <th class="py-3 px-4 text-left">Récurrence</th>
                                 <th class="py-3 px-4 text-left">Actions</th>
                             </tr>
@@ -158,20 +178,12 @@
                         <tbody>
                             @foreach($trajets as $trajet)
                             <tr class="border-b hover:bg-gray-50">
+                                <td class="py-3 px-4 whitespace-nowrap">
+                                    {{ $trajet->sousTrajets->first()->departure_time->format('d/m/Y H:i') }}
+                                </td>
                                 <td class="py-3 px-4">{{ $trajet->name }}</td>
                                 <td class="py-3 px-4">{{ $trajet->bus->name }}</td>
                                 <td class="py-3 px-4">{{ $trajet->chauffeur->nom }}</td>
-                                <td class="py-3 px-4">
-                                    <ul class="list-disc pl-4">
-                                        @foreach($trajet->sousTrajets as $sousTrajet)
-                                        <li>
-                                            {{ $sousTrajet->departure_city }} → 
-                                            {{ $sousTrajet->destination_city }}
-                                            ({{ $sousTrajet->price }} MAD)
-                                        </li>
-                                        @endforeach
-                                    </ul>
-                                </td>
                                 <td class="py-3 px-4">
                                     @if($trajet->is_recurring)
                                         <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
@@ -186,21 +198,29 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                     <div class="flex space-x-2">
-                                    <a href="{{ route('trajets.edit', $trajet) }}" class="text-blue-600 hover:text-blue-800 flex items-center">
-                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                                        </svg>
-                                        Modifier
-                                    </a>
-                                    <form action="{{ route('trajets.destroy', $trajet) }}" method="POST"
-                                          onsubmit="return confirm('Supprimer ce trajet ?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit"
-                                                class="text-red-500 hover:text-red-700 font-medium">
-                                            Supprimer
+                                        <button onclick="showTrajetDetails({{ $trajet->id }})" 
+                                                class="text-purple-600 hover:text-purple-800 flex items-center">
+                                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                            </svg>
+                                            Détails
                                         </button>
-                                    </form>
+                                        <a href="{{ route('trajets.edit', $trajet) }}" class="text-blue-600 hover:text-blue-800 flex items-center">
+                                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                            </svg>
+                                            Modifier
+                                        </a>
+                                        <form action="{{ route('trajets.destroy', $trajet) }}" method="POST"
+                                              onsubmit="return confirm('Supprimer ce trajet ?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit"
+                                                    class="text-red-500 hover:text-red-700 font-medium">
+                                                Supprimer
+                                            </button>
+                                        </form>
                                     </div>
                                 </td>
                             </tr>
@@ -209,6 +229,30 @@
                     </table>
                 </div>
             @endif
+        </div>
+    </div>
+</div>
+
+<!-- Modal pour les détails du trajet -->
+<div id="trajetDetailsModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full">
+    <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-2/3 lg:w-1/2 shadow-lg rounded-md bg-white">
+        <div class="flex justify-between items-center border-b pb-3">
+            <h3 class="text-xl font-bold text-gray-900" id="trajetDetailsTitle"></h3>
+            <button onclick="closeModal()" class="text-gray-400 hover:text-gray-500">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        
+        <div class="mt-4" id="trajetDetailsContent">
+            <!-- Le contenu sera chargé dynamiquement ici -->
+        </div>
+        
+        <div class="mt-4 flex justify-end">
+            <button onclick="closeModal()" class="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400">
+                Fermer
+            </button>
         </div>
     </div>
 </div>
@@ -299,6 +343,130 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
-</script>
+
+    // Fonction pour afficher les détails d'un trajet
+    function showTrajetDetails(trajetId) {
+        // Afficher le loader
+        document.getElementById('trajetDetailsContent').innerHTML = `
+            <div class="flex justify-center py-8">
+                <svg class="animate-spin h-8 w-8 text-purple-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+            </div>
+        `;
+        
+        // Afficher le modal
+        document.getElementById('trajetDetailsModal').classList.remove('hidden');
+        
+        // Charger les données via AJAX
+        fetch(`/trajets/${trajetId}/details`)
+            .then(response => response.json())
+            .then(data => {
+                // Mettre à jour le titre
+                document.getElementById('trajetDetailsTitle').textContent = `Détails du trajet: ${data.name}`;
+                
+                // Construire le contenu HTML
+                let html = `
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        <div>
+                            <h4 class="font-semibold text-gray-700">Bus:</h4>
+                            <p>${data.bus.name} (${data.bus.plate_number})</p>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-700">Chauffeur:</h4>
+                            <p>${data.chauffeur.nom}</p>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-700">Type:</h4>
+                            <p>${data.is_recurring ? 'Récurrent' : 'Ponctuel'}</p>
+                        </div>
+                        ${data.is_recurring ? `
+                        <div>
+                            <h4 class="font-semibold text-gray-700">Périodicité:</h4>
+                            <p>${data.recurring_pattern.recurrence_description}</p>
+                        </div>
+                        ` : ''}
+                    </div>
+                    
+                    <div class="border-t pt-4">
+                        <h4 class="font-semibold text-gray-700 mb-2">Étapes du trajet:</h4>
+                        <div class="space-y-4">
+                `;
+                
+                // Ajouter les étapes
+                data.sous_trajets.forEach((etape, index) => {
+                    html += `
+                        <div class="border rounded-lg p-4 mb-4 bg-gray-50">
+                            <div class="flex justify-between items-center mb-3">
+                                <h5 class="font-medium text-lg">Étape ${index + 1}: ${etape.departure_city} → ${etape.destination_city}</h5>
+                                <span class="text-sm font-semibold bg-purple-100 text-purple-800 px-2 py-1 rounded">
+                                    ${etape.price} MAD
+                                </span>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="bg-white p-3 rounded border">
+                                    <h6 class="font-semibold text-gray-700 mb-1">Départ</h6>
+                                    <div class="flex items-center">
+                                        <svg class="h-5 w-5 text-gray-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                        </svg>
+                                        <span>${etape.departure_time}</span>
+                                    </div>
+                                    <div class="flex items-center mt-2">
+                                        <svg class="h-5 w-5 text-gray-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        </svg>
+                                        <span>${etape.departure_city}</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-white p-3 rounded border">
+                                    <h6 class="font-semibold text-gray-700 mb-1">Arrivée</h6>
+                                    <div class="flex items-center">
+                                        <svg class="h-5 w-5 text-gray-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                        </svg>
+                                        <span>${etape.arrival_time}</span>
+                                    </div>
+                                    <div class="flex items-center mt-2">
+                                        <svg class="h-5 w-5 text-gray-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        </svg>
+                                        <span>${etape.destination_city}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                html += `
+                        </div>
+                    </div>
+                `;
+                
+                // Mettre à jour le contenu
+                document.getElementById('trajetDetailsContent').innerHTML = html;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('trajetDetailsContent').innerHTML = `
+                    <div class="text-red-500 text-center py-8">
+                        Une erreur s'est produite lors du chargement des détails du trajet.
+                    </div>
+                `;
+            });
+    }
+    
+    // Fonction pour fermer le modal
+    function closeModal() {
+        document.getElementById('trajetDetailsModal').classList.add('hidden');
+    }
+    </script>
+
 
 @endsection

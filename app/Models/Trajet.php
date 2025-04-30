@@ -15,6 +15,7 @@ class Trajet extends Model
         'bus_id',
         'chauffeur_id',
         'is_recurring',
+        'parent_id',
     ];
 
     // Relations
@@ -36,5 +37,21 @@ class Trajet extends Model
     public function recurringPattern()
     {
         return $this->hasOne(RecurringPattern::class);
+    }
+
+    public function parent()
+    {
+        return $this->belongsTo(Trajet::class, 'parent_id');
+    }
+
+// Relation avec les trajets enfants
+    public function children()
+    {
+        return $this->hasMany(Trajet::class, 'parent_id');
+    }
+
+    public function firstDepartureTime()
+    {
+        return $this->sousTrajets()->orderBy('departure_time')->first()->departure_time;
     }
 }
