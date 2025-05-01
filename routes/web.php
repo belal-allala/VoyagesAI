@@ -8,6 +8,7 @@ use App\Http\Controllers\EmployeController;
 use App\Http\Controllers\TrajetController;
 use App\Http\Controllers\SousTrajetController;
 use App\Http\Controllers\ChauffeurController;
+use App\Http\Controllers\VoyageurController;
 
 /*
 |--------------------------------------------------------------------------
@@ -86,3 +87,21 @@ Route::middleware(['auth', 'role:employe'])->group(function () {
 });
 
 Route::get('/employe/dashboard', [EmployeController::class, 'dashboard'])->name('employe.dashboard');
+
+// Route::get('/voyageur', [VoyageurController::class, 'index'])->name('voyageur.recherche');
+// Route::get('/trajets/recherche', [VoyageurController::class, 'recherche'])->name('trajets.recherche');
+// Routes pour les voyageurs
+Route::middleware('auth')->group(function () {
+    Route::prefix('reservations')->group(function () {
+        Route::post('/', [VoyageurController::class, 'storeReservation'])->name('reservations.store');
+        // Vous pouvez ajouter d'autres routes de réservation ici si nécessaire
+    });
+    
+    Route::get('/voyageur', [VoyageurController::class, 'index'])->name('voyageur.recherche');
+    Route::get('/trajets/recherche', [VoyageurController::class, 'recherche'])->name('trajets.recherche');
+    // Route::post('/reservations/create', [VoyageurController::class, 'createReservationTrajet'])
+    //  ->name('reservations.createTrajet');
+});
+
+Route::post('/reservations/create', [VoyageurController::class, 'createReservationTrajet'])
+     ->name('reservations.createTrajet');
