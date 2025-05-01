@@ -31,21 +31,20 @@ class VoyageurController extends Controller
 
         $dateRecherche = Carbon::parse($validated['date_depart'])->toDateString();
 
-        $trajetsCorrespondants = Trajet::whereHas('sousTrajets', function ($query) use ($validated, $dateRecherche) {
-                $query->where('departure_city', $validated['ville_depart'])
-                    ->whereDate('departure_time', $dateRecherche);
-            })
-            ->whereHas('sousTrajets', function ($query) use ($validated) {
-                $query->where('destination_city', $validated['ville_arrivee']);
-            })
-            ->with(['bus', 'chauffeur', 'sousTrajets' => function ($query) use ($dateRecherche) {
-                $query->whereDate('departure_time', $dateRecherche)
-                ->orderBy('departure_time');;
-            }])
-            ->get()
-            ->filter(function ($trajet) use ($validated) {
-                return $this->trajetCouvreItineraire($trajet, $validated['ville_depart'], $validated['ville_arrivee']);
-            })
+        $trajetsCorrespondants=Trajet::whereHas('sousTrajets', function ($query) use ($validated, $dateRecherche) {
+            $query->where('departure_city', $validated['ville_depart'])
+                ->whereDate('departure_time', $dateRecherche);
+        })
+        ->whereHas('sousTrajets', function ($query) use ($validated) {
+            $query->where('destination_city', $validated['ville_arrivee']);
+        })
+        ->with(['bus', 'chauffeur', 'sousTrajets' => function ($query) use ($dateRecherche) {
+            $query->whereDate('departure_time', $dateRecherche);
+        }])
+        ->get()
+        ->filter(function ($trajet) use ($validated) {
+            return $this->trajetCouvreItineraire($trajet, $validated['ville_depart'], $validated['ville_arrivee']);
+        })
             ->map(function ($trajet) use ($validated) {
                 $prixPartiel = 0;
                 $etapes = $trajet->sousTrajets;
@@ -157,7 +156,7 @@ class VoyageurController extends Controller
         $nbEtapes = count($etapes);
 
         $departTrouve = false;
-        $arriveeTrouvee = false;
+        // $arriveeTrouvee = false;
         $itineraireCouvert = false;
         // $villePrecedente = null;
 
@@ -171,7 +170,7 @@ class VoyageurController extends Controller
 
             if ($departTrouve /*&& $villePrecedente === $etape->departure_city*/) {
                 if ($etape->destination_city === $villeArrivee) {
-                    $arriveeTrouvee = true;
+                    // $arriveeTrouvee = true;
                     $itineraireCouvert = true;
                     break;
                 }
@@ -179,7 +178,7 @@ class VoyageurController extends Controller
             }
         }
 
-        return $departTrouve && $arriveeTrouvee && $itineraireCouvert;
+        return  $itineraireCouvert;
     }
 
 }

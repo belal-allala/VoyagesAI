@@ -99,9 +99,9 @@ Route::middleware('auth')->group(function () {
     
     Route::get('/voyageur', [VoyageurController::class, 'index'])->name('voyageur.recherche');
     Route::get('/trajets/recherche', [VoyageurController::class, 'recherche'])->name('trajets.recherche');
-    // Route::post('/reservations/create', [VoyageurController::class, 'createReservationTrajet'])
-    //  ->name('reservations.createTrajet');
+    Route::post('/reservations/create', [VoyageurController::class, 'createReservationTrajet'])
+     ->name('reservations.createTrajet');
 });
 
-Route::post('/reservations/create', [VoyageurController::class, 'createReservationTrajet'])
-     ->name('reservations.createTrajet');
+// Route::post('/reservations/create', [VoyageurController::class, 'createReservationTrajet'])
+//      ->name('reservations.createTrajet');
