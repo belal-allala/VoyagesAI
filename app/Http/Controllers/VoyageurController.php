@@ -107,34 +107,36 @@ class VoyageurController extends Controller
     public function storeReservation(Request $request)
     {
         $validated = $request->validate([
-            'sous_trajet_id' => 'required|exists:sous_trajets,id',
-            'date_depart' => 'required|date',
-            'ville_depart' => 'required|string',
-            'date_arrivee' => 'required|date',
-            'ville_arrivee' => 'required|string',
+            'trajet_id' => 'required|exists:trajets,id', // Valider trajet_id
+            'prix_partiel' => 'required|numeric|min:0', // Valider prix_partiel
             'nombre_passagers' => 'required|integer|min:1',
+            'date_depart' => 'required|datetime',
+            'ville_depart' => 'required|string',
+            'date_arrivee' => 'required|datetime',
+            'ville_arrivee' => 'required|string',
         ]);
+
+        $trajet = Trajet::find($validated['trajet_id']);
+
+        if (!$trajet) {
+            return back()->with('error', 'Trajet non trouvé.'); // Gérer le cas où le trajet n'existe pas
+        }
+
+        $prixTotal = $validated['prix_partiel'] * $validated['nombre_passagers'];
 
         $reservation = new Reservation();
         $reservation->user_id = auth()->id();
-        $reservation->sous_trajet_id = $validated['sous_trajet_id'];
+        $reservation->trajet_id = $validated['trajet_id']; // Utiliser trajet_id
         $reservation->date_depart = $validated['date_depart'];
         $reservation->ville_depart = $validated['ville_depart'];
         $reservation->date_arrivee = $validated['date_arrivee'];
         $reservation->ville_arrivee = $validated['ville_arrivee'];
-        $reservation->status = 'pending'; 
+        $reservation->status = 'pending'; // Statut "pending" car le paiement n'est pas encore effectué
         $reservation->save();
-
         
-        $billet = new Billet();
-        $billet->reservation_id = $reservation->id;
-        $billet->numero_billet = uniqid(); 
-        $billet->qr_code = '...'; 
-        $billet->status = 'valide';
-        $billet->save();
-
-        return redirect()->route('voyageur.confirmation', $reservation->id)
-                         ->with('success', 'Réservation créée avec succès!');
+        // Rediriger vers la page de paiement
+        return redirect()->route('paiement.index', $reservation)
+                         ->with('success', 'Réservation créée. Veuillez procéder au paiement.'); // Passer la réservation à la route paiement.index
     }
 
    

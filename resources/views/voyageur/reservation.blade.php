@@ -56,15 +56,12 @@
         <form method="POST" action="{{ route('reservations.store') }}" class="space-y-4">
             @csrf
             <input type="hidden" name="trajet_id" value="{{ $trajetData['trajet_id'] }}">
-            <input type="hidden" name="prix_total" value="{{ $trajetData['prix_partiel'] }}">
-            
-            @foreach($trajetData['sous_trajets_pertinents'] as $index => $sousTrajet)
-                <input type="hidden" name="sous_trajets[{{ $index }}][departure_city]" value="{{ $sousTrajet['departure_city'] }}">
-                <input type="hidden" name="sous_trajets[{{ $index }}][destination_city]" value="{{ $sousTrajet['destination_city'] }}">
-                <input type="hidden" name="sous_trajets[{{ $index }}][departure_time]" value="{{ $sousTrajet['departure_time'] }}">
-                <input type="hidden" name="sous_trajets[{{ $index }}][arrival_time]" value="{{ $sousTrajet['arrival_time'] }}">
-                <input type="hidden" name="sous_trajets[{{ $index }}][price]" value="{{ $sousTrajet['price'] }}">
-            @endforeach
+            <input type="hidden" name="prix_partiel" value="{{ $trajetData['prix_partiel'] }}"> 
+        
+            <input type="hidden" name="date_depart" value="{{ $trajetData['date_depart'] }}"> 
+            <input type="hidden" name="ville_depart" value="{{ $trajetData['ville_depart'] }}">
+            <input type="hidden" name="date_arrivee" value="{{ $trajetData['date_arrivee'] }}">
+            <input type="hidden" name="ville_arrivee" value="{{ $trajetData['ville_arrivee'] }}">
             
             <div class="border border-gray-200 rounded-lg p-6">
                 <h2 class="text-xl font-semibold mb-4">Détails de la réservation</h2>
@@ -79,7 +76,7 @@
                 </div>
                 
             </div>
-
+        
             <div class="flex justify-between pt-4">
                 <a href="{{ route('voyageur.recherche') }}" 
                    class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
