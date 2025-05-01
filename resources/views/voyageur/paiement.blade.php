@@ -212,7 +212,15 @@
                 return;
             }
             
-            const elements = stripe.elements();
+            // Récupérer le clientSecret de la session
+            const clientSecret = "{{ session('stripe_client_secret') }}";
+            if (!clientSecret || !clientSecret.includes('_secret_')) {
+        const errorDiv = document.getElementById('card-errors');
+        errorDiv.textContent = 'Erreur de configuration du paiement. Veuillez réessayer.';
+        document.getElementById('submit-button').disabled = true;
+        return;
+    }
+            const elements = stripe.elements({ clientSecret: clientSecret });
             
             // Style personnalisé pour les éléments Stripe
             const style = {
@@ -224,7 +232,7 @@
                     '::placeholder': {
                         color: '#9CA3AF'
                     },
-                    padding: '10px 12px',
+                   
                 },
                 invalid: {
                     color: '#EF4444',
@@ -267,53 +275,61 @@
             const buttonText = document.getElementById('button-text');
             const buttonSpinner = document.getElementById('button-spinner');
             
-            form.addEventListener('submit', (e) => {
+            form.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 
-                // Désactiver le bouton et afficher l'indicateur de chargement
                 submitButton.disabled = true;
                 buttonText.textContent = 'Traitement en cours...';
                 buttonSpinner.classList.remove('hidden');
-                
-                // Créer un token avec Stripe
-                stripe.createToken(cardNumber).then((result) => {
-                    if (result.error) {
-                        // Afficher l'erreur et réactiver le bouton
-                        document.getElementById('card-errors').textContent = result.error.message;
-                        submitButton.disabled = false;
-                        buttonText.textContent = 'Payer {{ number_format($reservation->prix_total, 2) }} MAD';
-                        buttonSpinner.classList.add('hidden');
-                    } else {
-                        // Ajouter le token au formulaire et soumettre
-                        const hiddenInput = document.createElement('input');
-                        hiddenInput.setAttribute('type', 'hidden');
-                        hiddenInput.setAttribute('name', 'stripeToken');
-                        hiddenInput.setAttribute('value', result.token.id);
-                        form.appendChild(hiddenInput);
-                        
-                        // Soumettre le formulaire
-                        form.submit();
+                document.getElementById('card-errors').textContent = '';
+
+                const { paymentIntent, error } = await stripe.confirmCardPayment(
+                    clientSecret, {
+                        payment_method: {
+                            card: cardNumber,
+                            billing_details: {
+                                name: "{{ auth()->user()->name }}"
+                            }
+                        }
                     }
-                });
+                );
+
+                if (error) {
+                    document.getElementById('card-errors').textContent = error.message;
+                    submitButton.disabled = false;
+                    buttonText.textContent = 'Payer {{ number_format($reservation->prix_total, 2) }} MAD';
+                    buttonSpinner.classList.add('hidden');
+                } else {
+                    // Envoyer le payment_intent au serveur
+                    const form = document.getElementById('payment-form');
+                    const hiddenInput = document.createElement('input');
+                    hiddenInput.setAttribute('type', 'hidden');
+                    hiddenInput.setAttribute('name', 'payment_intent');
+                    hiddenInput.setAttribute('value', paymentIntent.id);
+                    form.appendChild(hiddenInput);
+                    
+                    // Soumettre le formulaire normalement
+                    form.submit();
+                }
             });
             
             // Gestion des méthodes de paiement (pour une future implémentation)
-            const paymentMethods = document.querySelectorAll('.payment-method');
-            paymentMethods.forEach(method => {
-                method.addEventListener('click', function() {
-                    if (!this.classList.contains('cursor-not-allowed')) {
-                        // Supprimer la classe active de toutes les méthodes
-                        paymentMethods.forEach(m => {
-                            if (!m.classList.contains('cursor-not-allowed')) {
-                                m.classList.remove('active', 'border-green-500', 'bg-green-50');
-                            }
-                        });
+            // const paymentMethods = document.querySelectorAll('.payment-method');
+            // paymentMethods.forEach(method => {
+            //     method.addEventListener('click', function() {
+            //         if (!this.classList.contains('cursor-not-allowed')) {
+            //             // Supprimer la classe active de toutes les méthodes
+            //             paymentMethods.forEach(m => {
+            //                 if (!m.classList.contains('cursor-not-allowed')) {
+            //                     m.classList.remove('active', 'border-green-500', 'bg-green-50');
+            //                 }
+            //             });
                         
-                        // Ajouter la classe active à la méthode cliquée
-                        this.classList.add('active', 'border-green-500', 'bg-green-50');
-                    }
-                });
-            });
+            //             // Ajouter la classe active à la méthode cliquée
+            //             this.classList.add('active', 'border-green-500', 'bg-green-50');
+            //         }
+            //     });
+            // });
         });
     </script>
     

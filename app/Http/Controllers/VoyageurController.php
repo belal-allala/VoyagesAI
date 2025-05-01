@@ -13,6 +13,9 @@ use App\Models\Chauffeur;
 use App\Models\Compagnie;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
+use Stripe\Stripe;
+use Stripe\PaymentIntent;
+
 
 class VoyageurController extends Controller
 {
@@ -112,48 +115,73 @@ class VoyageurController extends Controller
 }
 
 
-    public function storeReservation(Request $request)
-    {
-        $validated = $request->validate([
-            'trajet_id' => 'required|exists:trajets,id', 
-            'prix_partiel' => 'required|numeric|min:0', 
-            'nombre_passagers' => 'required|integer|min:1',
-            'date_depart' => 'required|date',
-            'ville_depart' => 'required|string',
-            'date_arrivee' => 'required|date',
-            'ville_arrivee' => 'required|string',
-        ]);
+public function storeReservation(Request $request)
+{
+    $validated = $request->validate([
+        'trajet_id' => 'required|exists:trajets,id',
+        'prix_partiel' => 'required|numeric|min:0',
+        'nombre_passagers' => 'required|integer|min:1',
+        'date_depart' => 'required|date',
+        'ville_depart' => 'required|string',
+        'date_arrivee' => 'required|date',
+        'ville_arrivee' => 'required|string',
+    ]);
 
-        $trajet = Trajet::find($validated['trajet_id']);
+    $trajet = Trajet::find($validated['trajet_id']);
 
-        if (!$trajet) {
-            return back()->with('error', 'Trajet non trouvé.'); 
-        }
-
-        $prixTotal = $validated['prix_partiel'] * $validated['nombre_passagers'];
-
-        $reservation = new Reservation();
-        $reservation->user_id = auth()->id();
-        $reservation->trajet_id = $validated['trajet_id']; 
-        $reservation->date_depart = $validated['date_depart'];
-        $reservation->ville_depart = $validated['ville_depart'];
-        $reservation->date_arrivee = $validated['date_arrivee'];
-        $reservation->ville_arrivee = $validated['ville_arrivee'];
-        $reservation->nombre_passagers = $validated['nombre_passagers'];
-        $reservation->prix_total = $prixTotal;
-        $reservation->status = 'pending'; 
-        $reservation->save();
-        
-        return redirect()->route('paiement.index', $reservation)
-                         ->with('success', 'Réservation créée. Veuillez procéder au paiement.'); 
+    if (!$trajet) {
+        return back()->with('error', 'Trajet non trouvé.');
     }
+
+    $prixTotal = $validated['prix_partiel'] * $validated['nombre_passagers'];
+
+    $reservation = new Reservation();
+    $reservation->user_id = auth()->id();
+    $reservation->trajet_id = $validated['trajet_id'];
+    $reservation->date_depart = $validated['date_depart'];
+    $reservation->ville_depart = $validated['ville_depart'];
+    $reservation->date_arrivee = $validated['date_arrivee'];
+    $reservation->ville_arrivee = $validated['ville_arrivee'];
+    $reservation->nombre_passagers = $validated['nombre_passagers'];
+    $reservation->prix_total = $prixTotal;
+    $reservation->status = 'pending';
+    $reservation->save();
+
+    // Initialisation de Stripe
+    Stripe::setApiKey(config('services.stripe.secret'));
+
+    // Création du Payment Intent
+    try {
+        $paymentIntent = PaymentIntent::create([
+            'amount' => $prixTotal * 100, // Montant en centimes
+            'currency' => 'mad',
+            'metadata' => [
+                'reservation_id' => $reservation->id, 
+                'user_id' => auth()->id(),
+            ],
+            'payment_method_types' => ['card'], 
+        ]);
+    } catch (\Exception $e) {
+        // Gérer les erreurs lors de la création du Payment Intent
+        \Log::error('Erreur lors de la création du Payment Intent : ' . $e->getMessage());
+        return back()->with('error', 'Une erreur s\'est produite lors de la préparation du paiement. Veuillez réessayer.');
+    }
+
+    // Redirection vers la page de paiement avec le client_secret
+    return redirect()->route('paiement.index', $reservation)
+                    ->with('stripe_client_secret', $paymentIntent->client_secret) 
+                     ->with('success', 'Réservation créée. Veuillez procéder au paiement.');
+}
 
    
-    public function confirmation($reservation_id)
-    {
-        $reservation = Reservation::findOrFail($reservation_id);
-        return view('voyageur.confirmation', compact('reservation'));
+public function confirmationPaiement(Reservation $reservation)
+{
+    if ($reservation->user_id !== auth()->id()) {
+        abort(403);
     }
+
+    return view('voyageur.confirmationPaiement', compact('reservation'));
+}
 
     public function historiqueReservations()
     {

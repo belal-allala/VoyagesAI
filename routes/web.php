@@ -28,7 +28,7 @@ Route::get('/', function () {
 })->name("welcome");
 
 Route::get('/home', function () {
-    return view('home');
+    return view('welcome');
 })->name("home");
 
 Route::get('/profile', function () {
@@ -110,4 +110,16 @@ Route::middleware('auth')->group(function () {
 // Route::post('/reservations/create', [VoyageurController::class, 'createReservationTrajet'])
 //      ->name('reservations.createTrajet');
 
-Route::get('/reservations', [PaiementController::class, 'traitement'])->name('paiement.traitement');
+
+
+Route::post('/stripe/webhook', [StripeWebhookController::class, 'handleWebhook'])
+    ->name('stripe.webhook');
+    
+    Route::post('/reservations/{reservation}/paiement', [PaiementController::class, 'traitement'])
+    ->name('paiement.traitement');
+
+Route::get('/reservations/{reservation}/confirmation-paiement', [VoyageurController::class, 'confirmationPaiement'])
+    ->name('voyageur.confirmationPaiement');
+
+
+

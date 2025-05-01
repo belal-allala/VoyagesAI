@@ -5,37 +5,38 @@ use App\Models\Reservation;
 use Illuminate\Http\Request;
 use Stripe\Stripe;
 use Stripe\Charge;
+use Stripe\Exception\CardException;
 use Exception;
 
 class PaiementController extends Controller
 {
     public function index(Reservation $reservation)
     {
+        if ($reservation->user_id !== auth()->id()) {
+            abort(403, 'Accès non autorisé');
+        }
+    
+        if ($reservation->status !== 'pending') {
+            return redirect()->route('home')->with('error', 'Cette réservation a déjà été traitée.');
+        }
+
         return view('voyageur.paiement', compact('reservation'));
     }
 
     public function traitement(Request $request, Reservation $reservation)
-    {
-        $this->validate($request, [
-            'stripeToken' => 'required',
-        ]);
+{
+    Stripe::setApiKey(config('services.stripe.secret'));
 
-        try {
-            Stripe::setApiKey(config('services.stripe.secret')); // Utilisez la clé secrète depuis config/services.php
+    try {
+        $paymentIntent = \Stripe\PaymentIntent::retrieve($request->input('payment_intent'));
 
-            $charge = Charge::create([
-                'amount' => $reservation->sousTrajet->price * 100, // Montant en centimes
-                'currency' => 'mad',
-                'description' => 'Paiement de la réservation #' . $reservation->id,
-                'source' => $request->stripeToken,
-            ]);
-
-            // Si le paiement est réussi, mettez à jour le statut de la réservation, créez le billet, etc.
+        if ($paymentIntent->status === 'succeeded') {
+            // Mettre à jour le statut de la réservation
             $reservation->update(['status' => 'confirmed']);
 
-            // Générez le billet
-            $numeroBillet = uniqid('Billet_');
-            $qrCode = 'QRCODE_' . $numeroBillet; // Générez un QR Code (vous pouvez utiliser une librairie pour cela)
+            // Créer le billet
+            $numeroBillet = 'BLT'.strtoupper(uniqid());
+            $qrCode = 'QR_'.$numeroBillet;
 
             $reservation->billet()->create([
                 'numero_billet' => $numeroBillet,
@@ -43,10 +44,15 @@ class PaiementController extends Controller
                 'status' => 'valide',
             ]);
 
-            return redirect()->route('home')->with('success', 'Paiement effectué avec succès. Votre billet a été généré.');
-
-        } catch (Exception $e) {
-            return back()->with('error', $e->getMessage());
+            return redirect()->route('voyageur.confirmationPaiement', $reservation)
+                            ->with('success', 'Paiement effectué avec succès!');
+        } else {
+            \Log::error('Payment Intent échoué: '.$paymentIntent->id);
+            return back()->with('error', 'Le paiement n\'a pas pu être confirmé');
         }
+    } catch (\Exception $e) {
+        \Log::error('Erreur paiement: '.$e->getMessage());
+        return back()->with('error', 'Erreur lors du traitement du paiement');
     }
+}
 }
