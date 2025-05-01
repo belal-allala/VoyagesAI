@@ -119,19 +119,20 @@ class VoyageurController extends Controller
         $trajet = Trajet::find($validated['trajet_id']);
 
         if (!$trajet) {
-            return back()->with('error', 'Trajet non trouvé.'); // Gérer le cas où le trajet n'existe pas
+            return back()->with('error', 'Trajet non trouvé.'); 
         }
 
         $prixTotal = $validated['prix_partiel'] * $validated['nombre_passagers'];
 
         $reservation = new Reservation();
         $reservation->user_id = auth()->id();
-        $reservation->trajet_id = $validated['trajet_id']; // Utiliser trajet_id
+        $reservation->trajet_id = $validated['trajet_id']; 
         $reservation->date_depart = $validated['date_depart'];
         $reservation->ville_depart = $validated['ville_depart'];
         $reservation->date_arrivee = $validated['date_arrivee'];
         $reservation->ville_arrivee = $validated['ville_arrivee'];
-        $reservation->status = 'pending'; // Statut "pending" car le paiement n'est pas encore effectué
+        $reservation->nombre_passagers = $validated['nombre_passagers'];
+        $reservation->status = 'pending'; 
         $reservation->save();
         
         // Rediriger vers la page de paiement

@@ -20,6 +20,8 @@ class Reservation extends Model
         'ville_depart',
         'date_arrivee',
         'ville_arrivee',
+        'nombre_passagers',
+        'prix_total',
         'status',
         'note'
     ];
