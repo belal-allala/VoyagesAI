@@ -109,7 +109,7 @@
                         <span class="text-lg font-bold">
                             Prix: {{ number_format($trajet->prix_partiel, 2) }} MAD
                         </span>
-                        <form method="POST" action="{{ route('reservations.createTraj') }}">
+                        <form method="POST" action="{{ route('reservations.createTrajet') }}">
                             @csrf
                             <input type="hidden" name="trajet_id" value="{{ $trajet->id }}">
                             <input type="hidden" name="trajet_name" value="{{ $trajet->name }}">

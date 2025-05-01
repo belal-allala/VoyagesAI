@@ -71,48 +71,56 @@ class VoyageurController extends Controller
     }
 
     public function createReservationTrajet(Request $request)
-    {
-        $validated = $request->validate([
-            'trajet_id' => 'required|exists:trajets,id',
-            'trajet_name' => 'required|string',
-            'bus_name' => 'required|string',
-            'bus_plate' => 'required|string',
-            'chauffeur' => 'required|string',
-            'prix_partiel' => 'required|numeric',
-            'sous_trajets' => 'required|array',
-            'sous_trajets.*.departure_city' => 'required|string',
-            'sous_trajets.*.destination_city' => 'required|string',
-            'sous_trajets.*.departure_time' => 'required|date',
-            'sous_trajets.*.arrival_time' => 'required|date',
-            'sous_trajets.*.price' => 'required|numeric',
-        ]);
+{
+    $validated = $request->validate([
+        'trajet_id' => 'required|exists:trajets,id',
+        'trajet_name' => 'required|string',
+        'bus_name' => 'required|string',
+        'bus_plate' => 'required|string',
+        'chauffeur' => 'required|string',
+        'prix_partiel' => 'required|numeric',
+        'sous_trajets' => 'required|array|min:1', 
+        'sous_trajets.*.departure_city' => 'required|string',
+        'sous_trajets.*.destination_city' => 'required|string',
+        'sous_trajets.*.departure_time' => 'required|date',
+        'sous_trajets.*.arrival_time' => 'required|date',
+        'sous_trajets.*.price' => 'required|numeric',
+    ]);
 
-        $trajetData = [
-            'trajet_id' => $validated['trajet_id'],
-            'trajet_name' => $validated['trajet_name'],
-            'bus' => [
-                'name' => $validated['bus_name'],
-                'plate_number' => $validated['bus_plate'],
-            ],
-            'chauffeur' => $validated['chauffeur'],
-            'prix_partiel' => $validated['prix_partiel'],
-            'sous_trajets_pertinents' => $validated['sous_trajets'],
-            'sous_trajets_complets' => count($validated['sous_trajets'])
-        ];
+    $sousTrajets = $validated['sous_trajets'];
+    $premierSousTrajet = reset($sousTrajets); 
+    $dernierSousTrajet = end($sousTrajets); 
 
-        return view('voyageur.reservation', compact('trajetData'));
-    }
+    $trajetData = [
+        'trajet_id' => $validated['trajet_id'],
+        'trajet_name' => $validated['trajet_name'],
+        'bus' => [
+            'name' => $validated['bus_name'],
+            'plate_number' => $validated['bus_plate'],
+        ],
+        'chauffeur' => $validated['chauffeur'],
+        'prix_partiel' => $validated['prix_partiel'],
+        'sous_trajets_pertinents' => $sousTrajets, 
+        'sous_trajets_complets' => count($sousTrajets),
+        'ville_depart' => $premierSousTrajet['departure_city'], 
+        'date_depart' => $premierSousTrajet['departure_time'], 
+        'ville_arrivee' => $dernierSousTrajet['destination_city'], 
+        'date_arrivee' => $dernierSousTrajet['arrival_time'], 
+    ];
+
+    return view('voyageur.reservation', compact('trajetData'));
+}
 
 
     public function storeReservation(Request $request)
     {
         $validated = $request->validate([
-            'trajet_id' => 'required|exists:trajets,id', // Valider trajet_id
-            'prix_partiel' => 'required|numeric|min:0', // Valider prix_partiel
+            'trajet_id' => 'required|exists:trajets,id', 
+            'prix_partiel' => 'required|numeric|min:0', 
             'nombre_passagers' => 'required|integer|min:1',
-            'date_depart' => 'required|datetime',
+            'date_depart' => 'required|date',
             'ville_depart' => 'required|string',
-            'date_arrivee' => 'required|datetime',
+            'date_arrivee' => 'required|date',
             'ville_arrivee' => 'required|string',
         ]);
 
@@ -132,12 +140,12 @@ class VoyageurController extends Controller
         $reservation->date_arrivee = $validated['date_arrivee'];
         $reservation->ville_arrivee = $validated['ville_arrivee'];
         $reservation->nombre_passagers = $validated['nombre_passagers'];
+        $reservation->prix_total = $prixTotal;
         $reservation->status = 'pending'; 
         $reservation->save();
         
-        // Rediriger vers la page de paiement
         return redirect()->route('paiement.index', $reservation)
-                         ->with('success', 'Réservation créée. Veuillez procéder au paiement.'); // Passer la réservation à la route paiement.index
+                         ->with('success', 'Réservation créée. Veuillez procéder au paiement.'); 
     }
 
    

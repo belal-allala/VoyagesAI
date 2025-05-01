@@ -9,6 +9,8 @@ use App\Http\Controllers\TrajetController;
 use App\Http\Controllers\SousTrajetController;
 use App\Http\Controllers\ChauffeurController;
 use App\Http\Controllers\VoyageurController;
+use App\Http\Controllers\ReservationController;
+use App\Http\Controllers\PaiementController;
 
 /*
 |--------------------------------------------------------------------------
@@ -94,14 +96,18 @@ Route::get('/employe/dashboard', [EmployeController::class, 'dashboard'])->name(
 Route::middleware('auth')->group(function () {
     Route::prefix('reservations')->group(function () {
         Route::post('/', [VoyageurController::class, 'storeReservation'])->name('reservations.store');
-        // Vous pouvez ajouter d'autres routes de réservation ici si nécessaire
+        Route::get('/{reservation}/paiement', [PaiementController::class, 'index'])->name('paiement.index');
     });
     
     Route::get('/voyageur', [VoyageurController::class, 'index'])->name('voyageur.recherche');
     Route::get('/trajets/recherche', [VoyageurController::class, 'recherche'])->name('trajets.recherche');
     Route::post('/reservations/create', [VoyageurController::class, 'createReservationTrajet'])
      ->name('reservations.createTrajet');
+
+    // Route::get('/reservations/{reservation}/paiement', [PaiementController::class, 'index'])->name('paiement.index');
 });
 
 // Route::post('/reservations/create', [VoyageurController::class, 'createReservationTrajet'])
 //      ->name('reservations.createTrajet');
+
+Route::get('/reservations', [PaiementController::class, 'traitement'])->name('paiement.traitement');
