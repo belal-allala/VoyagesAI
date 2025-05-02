@@ -15,6 +15,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Stripe\Stripe;
 use Stripe\PaymentIntent;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Barryvdh\DomPDF\Facade\Pdf;
+
 
 
 class VoyageurController extends Controller
@@ -220,4 +223,26 @@ public function confirmationPaiement(Reservation $reservation)
         return  $itineraireCouvert;
     }
 
+    public function generateTicketPdf(Reservation $reservation) {
+    // Vérifications d'accès
+    if ($reservation->user_id !== auth()->id()) abort(403);
+    if ($reservation->status !== 'confirmed') {
+        return redirect()->back()->with('error', 'Réservation non confirmée');
+    }
+
+    // Générer le QR code en SVG (sans dépendance à Imagick)
+    $qrCodeSvg = QrCode::size(200)->style('square')->generate($reservation->billet->qr_code);
+
+    // Passer les données à la vue
+    $pdf = Pdf::loadView('voyageur.ticket_pdf', [
+        'reservation' => $reservation,
+        'qrCodeSvg' => $qrCodeSvg, // SVG brut
+    ]);
+
+    // Autoriser les images externes (si nécessaire)
+    $pdf->setOption('isRemoteEnabled', true);
+    $pdf->setOption('isHtml5ParserEnabled', true);
+
+    return $pdf->download('ticket-'.$reservation->billet->numero_billet.'.pdf');
+}
 }
