@@ -12,7 +12,8 @@ use App\Http\Controllers\{
     VoyageurController,
     ReservationController,
     PaiementController,
-    StripeWebhookController
+    StripeWebhookController,
+    ProfileController
 };
 
 /*
@@ -26,7 +27,13 @@ Route::get('/', fn() => view('welcome'))->name("welcome");
 Route::get('/home', fn() => view('welcome'))->name("home");
 
 // Profil (authentification requise)
-Route::get('/profile', fn() => view('profile'))->middleware(['auth'])->name('profile');
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.updatePassword');
+    // (Optionnel)
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
 
 // Authentification
 Route::get('/register', [WebAuthController::class, 'register'])->name('register');
@@ -37,6 +44,8 @@ Route::post('/logout', [WebAuthController::class, 'logout'])->name('logout');
 
 // Espace Employé (authentifié avec rôle "employe")
 Route::middleware(['auth', 'role:employe'])->group(function () {
+
+    Route::get('/employe/dashboard', [EmployeController::class, 'dashboard'])->name('employe.dashboard');
     
     // Compagnies
     Route::get('/compagnies/create', [CompagnieController::class, 'create'])->name('compagnies.create');
@@ -57,7 +66,7 @@ Route::middleware(['auth', 'role:employe'])->group(function () {
         Route::get('/{trajet}/edit', [TrajetController::class, 'edit'])->name('trajets.edit');
         Route::put('/{trajet}', [TrajetController::class, 'update'])->name('trajets.update');
         Route::delete('/{trajet}', [TrajetController::class, 'destroy'])->name('trajets.destroy');
-        Route::get('/{trajet}/details', [TrajetController::class, 'details'])->name('trajets.details');
+        
     });
 
     // Sous-trajets
@@ -73,11 +82,9 @@ Route::middleware(['auth', 'role:employe'])->group(function () {
     });
 });
 
-// Tableau de bord Employé
-Route::get('/employe/dashboard', [EmployeController::class, 'dashboard'])->name('employe.dashboard');
 
 // Espace Voyageur (authentifié)
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'role:voyageur'])->group(function () {
     // Réservation et Paiement
     Route::prefix('reservations')->group(function () {
         Route::post('/', [VoyageurController::class, 'storeReservation'])->name('reservations.store');
@@ -85,14 +92,29 @@ Route::middleware('auth')->group(function () {
         Route::post('/{reservation}/paiement', [PaiementController::class, 'traitement'])->name('paiement.traitement');
         Route::get('/{reservation}/confirmation-paiement', [VoyageurController::class, 'confirmationPaiement'])->name('voyageur.confirmationPaiement');
         Route::get('/{reservation}/ticket-pdf', [VoyageurController::class, 'generateTicketPdf'])->name('voyageur.ticketPdf');
+        Route::post('/create', [VoyageurController::class, 'createReservationTrajet'])->name('reservations.createTrajet');
     });
-
-    Route::post('/reservations/create', [VoyageurController::class, 'createReservationTrajet'])->name('reservations.createTrajet');
 
     // Recherche
     Route::get('/voyageur', [VoyageurController::class, 'index'])->name('voyageur.recherche');
     Route::get('/trajets/recherche', [VoyageurController::class, 'recherche'])->name('trajets.recherche');
 });
 
+Route::middleware(['auth', 'role:chauffeur'])->group(function () {
+    Route::get('/chauffeur/trajets', [ChauffeurController::class, 'trajetsAssignes'])->name('chauffeur.trajets');
+    Route::get('/chauffeur/passagers', [ChauffeurController::class, 'listePassagers'])->name('chauffeur.passagers');
+    Route::get('/chauffeur/scan', [ChauffeurController::class, 'scan'])->name('chauffeur.scan');
+    Route::post('/chauffeur/billet/valider', [ChauffeurController::class, 'validerBillet'])->name('chauffeur.billet.valider');
+});
+
 // Stripe Webhook
 Route::post('/stripe/webhook', [StripeWebhookController::class, 'handleWebhook'])->name('stripe.webhook');
+Route::get('/trajets/{trajet}/details', [TrajetController::class, 'details'])->name('trajets.details');
+
+Route::middleware('auth')->group(function () {
+    // ...
+    Route::get('/voyageur/reservations', [VoyageurController::class, 'mesReservations'])->name('voyageur.reservations');
+    Route::get('/voyageur/reservations/{reservation}', [VoyageurController::class, 'reservationDetails'])->name('voyageur.reservations.details');
+    // (Optionnel)
+    Route::post('/voyageur/reservations/{reservation}/annuler', [VoyageurController::class, 'annulerReservation'])->name('voyageur.reservations.annuler');
+});
