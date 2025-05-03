@@ -231,7 +231,7 @@ public function confirmationPaiement(Reservation $reservation)
     }
 
     // Générer le QR code en SVG (sans dépendance à Imagick)
-    $qrCodeSvg = QrCode::size(200)->style('square')->generate($reservation->billet->qr_code);
+    $qrCodeSvg = QrCode::size(200)->style('square')->generate($reservation->billet->numero_billet);
 
     // Passer les données à la vue
     $pdf = Pdf::loadView('voyageur.ticket_pdf', [
@@ -243,6 +243,55 @@ public function confirmationPaiement(Reservation $reservation)
     $pdf->setOption('isRemoteEnabled', true);
     $pdf->setOption('isHtml5ParserEnabled', true);
 
-    return $pdf->download('ticket-'.$reservation->billet->numero_billet.'.pdf');
+    return View('voyageur.ticket_pdf', [
+        'reservation' => $reservation,
+        'qrCodeSvg' => $qrCodeSvg, 
+    ]);
 }
+
+public function mesReservations()
+    {
+        $user = Auth::user();
+
+        // Réservations futures (date_depart >= aujourd'hui)
+        $reservationsActives = Reservation::where('user_id', $user->id)
+            ->where('date_depart', '>=', now())
+            ->with(['trajet', 'trajet.bus', 'trajet.chauffeur', 'billet'])
+            ->orderBy('date_depart')
+            ->get();
+
+        // Historique des réservations (date_depart < aujourd'hui)
+        $reservationsHistorique = Reservation::where('user_id', $user->id)
+            ->where('date_depart', '<', now())
+            ->with(['trajet', 'trajet.bus', 'trajet.chauffeur', 'billet'])
+            ->orderBy('date_depart', 'desc')
+            ->get();
+
+        return view('voyageur.reservations.index', compact('reservationsActives', 'reservationsHistorique'));
+    }
+
+    public function reservationDetails(Reservation $reservation)
+    {
+        if ($reservation->user_id !== Auth::id()) {
+            abort(403, 'Accès non autorisé');
+        }
+
+        $reservation->load(['trajet.sousTrajets', 'billet']); // Charger les sous-trajets et le billet
+
+        return view('voyageur.reservations.details', compact('reservation'));
+    }
+
+    // (Optionnel)
+    public function annulerReservation(Request $request, Reservation $reservation)
+    {
+        if ($reservation->user_id !== Auth::id()) {
+            abort(403, 'Accès non autorisé');
+        }
+
+        // Ajouter une logique pour vérifier si l'annulation est possible (par exemple, en fonction de la date de départ)
+        
+        $reservation->update(['status' => 'cancelled']); // Ou un autre statut approprié
+        
+        return redirect()->route('voyageur.reservations')->with('success', 'Réservation annulée avec succès.');
+    }
 }
