@@ -54,4 +54,9 @@ class Trajet extends Model
     {
         return $this->sousTrajets()->orderBy('departure_time')->first()->departure_time;
     }
+
+    public function reservations()
+    {
+        return $this->hasMany(Reservation::class);
+    }
 }
