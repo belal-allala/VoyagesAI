@@ -13,7 +13,8 @@ use App\Http\Controllers\{
     ReservationController,
     PaiementController,
     StripeWebhookController,
-    ProfileController
+    ProfileController,
+    UserController
 };
 
 /*
@@ -117,4 +118,29 @@ Route::middleware('auth')->group(function () {
     Route::get('/voyageur/reservations/{reservation}', [VoyageurController::class, 'reservationDetails'])->name('voyageur.reservations.details');
     // (Optionnel)
     Route::post('/voyageur/reservations/{reservation}/annuler', [VoyageurController::class, 'annulerReservation'])->name('voyageur.reservations.annuler');
+});
+
+Route::middleware(['auth', 'role:admin'])->prefix('admin/users')->group(function () {
+
+    // Afficher la liste des utilisateurs (index)
+    Route::get('/', [UserController::class, 'index'])->name('admin.users.index');
+
+    // Afficher le formulaire de création d'un utilisateur (create)
+    Route::get('/create', [UserController::class, 'create'])->name('admin.users.create');
+
+    // Enregistrer un nouvel utilisateur (store)
+    Route::post('/', [UserController::class, 'store'])->name('admin.users.store');
+
+    // Afficher un utilisateur spécifique (show)
+    Route::get('/{user}', [UserController::class, 'show'])->name('admin.users.show');
+
+    // Afficher le formulaire d'édition d'un utilisateur (edit)
+    Route::get('/{user}/edit', [UserController::class, 'edit'])->name('admin.users.edit');
+
+    // Mettre à jour un utilisateur (update)
+    Route::put('/{user}', [UserController::class, 'update'])->name('admin.users.update');
+    Route::patch('/{user}', [UserController::class, 'update'])->name('admin.users.update'); // Pour les mises à jour partielles
+
+    // Supprimer un utilisateur (destroy)
+    Route::delete('/{user}', [UserController::class, 'destroy'])->name('admin.users.destroy');
 });

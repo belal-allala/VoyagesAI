@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->enum('role', ['voyageur', 'employe', 'chauffeur'])->default('voyageur');
+            $table->enum('role', ['voyageur', 'employe', 'chauffeur', 'admin'])->default('voyageur');
             $table->foreignId('company_id')->nullable()->constrained('compagnies')->onDelete('set null');
             $table->rememberToken();
             $table->timestamps();
