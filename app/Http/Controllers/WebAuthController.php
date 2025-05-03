@@ -55,7 +55,7 @@ class WebAuthController extends Controller
 
         $request->session()->regenerateToken();
 
-        return redirect()->route('welcome')->with('message', 'Déconnexion réussie.');
+        return redirect()->route('welcome');
     }
 
     public function login()
