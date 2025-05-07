@@ -25,7 +25,6 @@ class SousTrajet extends Model
         'arrival_time' => 'datetime',
     ];
 
-    // Relations
     public function trajet()
     {
         return $this->belongsTo(Trajet::class);

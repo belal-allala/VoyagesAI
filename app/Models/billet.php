@@ -16,7 +16,6 @@ class Billet extends Model
         'status'
     ];
 
-    // Relations
     public function reservation()
     {
         return $this->belongsTo(Reservation::class);

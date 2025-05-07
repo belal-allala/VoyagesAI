@@ -4,6 +4,7 @@
 
 @section('content')
     <!-- Messages de session -->
+    {{-- J'ai conservé les messages de session pour qu'ils s'affichent au-dessus du contenu --}}
     <div class="container mx-auto px-4 py-4">
         <div class="space-y-4">
             @if (session('success'))
@@ -53,16 +54,18 @@
         </div>
     </div>
 
-    <!-- Section Héro avec recherche -->
+    <!-- Section Héro SANS recherche directement -->
     <div class="relative bg-gradient-to-r from-gray-900 to-gray-800 text-white">
         <div class="absolute inset-0 overflow-hidden">
+            {{-- Assurez-vous que l'image existe dans public/images --}}
             <img src="{{ asset('images/hero-background.jpg') }}" alt="Bus en voyage" class="w-full h-full object-cover opacity-30">
         </div>
         <div class="container mx-auto px-4 py-20 relative z-10">
-            <div class="max-w-3xl mx-auto text-center mb-12">
+            <div class="max-w-3xl mx-auto text-center"> {{-- mb-12 retiré ou ajusté car le formulaire en dessous est parti --}}
                 <h1 class="text-4xl md:text-5xl font-bold mb-6">Voyagez en toute simplicité avec Vega Go</h1>
                 <p class="text-xl text-gray-200 mb-8">Réservez vos billets de bus en quelques clics et profitez d'une expérience de voyage sans stress</p>
                 <div class="flex gap-4 justify-center">
+                    {{-- Ce bouton redirige déjà vers la page de recherche --}}
                     <a href="{{ route('voyageur.recherche') }}" class="px-6 py-3 bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-semibold rounded-lg transition-colors">
                         Rechercher un trajet
                     </a>
@@ -72,6 +75,8 @@
                 </div>
             </div>
 
+            {{-- ANCIEN BLOC DE RECHERCHE - RETIRÉ --}}
+            {{--
             <div class="bg-white rounded-xl shadow-xl p-6 max-w-4xl mx-auto">
                 <h2 class="text-gray-800 text-xl font-semibold mb-4">Rechercher un trajet</h2>
                 <form action="{{ route('voyageur.recherche') }}" method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -113,18 +118,24 @@
                     </div>
                 </form>
             </div>
+            --}}
         </div>
     </div>
 
     <!-- Destinations populaires -->
+    {{-- Cette section reste pour présenter des trajets --}}
     <div class="bg-gray-50 py-16">
         <div class="container mx-auto px-4">
             <div class="text-center mb-12">
                 <h2 class="text-3xl font-bold text-gray-900 mb-4">Destinations populaires</h2>
-                <p class="text-gray-600 max-w-2xl mx-auto">Découvrez nos trajets les plus demandés et planifiez votre prochain voyage dès maintenant</p>
+                {{-- Texte ajusté --}}
+                <p class="text-gray-600 max-w-2xl mx-auto">Découvrez nos trajets les plus demandés et réservez facilement en cliquant sur "Réserver"</p>
             </div>
-            
+
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {{-- Les cartes de destinations populaires restent --}}
+                {{-- Assurez-vous que les liens "Réserver" pointent bien vers la page de recherche --}}
+
                 <!-- Destination 1 -->
                 <div class="bg-white rounded-xl overflow-hidden shadow-md transition-transform hover:scale-105">
                     <div class="h-48 overflow-hidden">
@@ -143,7 +154,8 @@
                         </div>
                         <div class="flex justify-between items-center">
                             <span class="text-2xl font-bold text-gray-900">120 MAD</span>
-                            <a href="{{ route('voyageur.recherche', ['depart' => 'casablanca', 'arrivee' => 'marrakech']) }}" class="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg transition-colors">Réserver</a>
+                             {{-- Le lien "Réserver" pointe vers la page de recherche avec paramètres --}}
+                            <a href="{{ route('voyageur.recherche', ['ville_depart' => 'Casablanca', 'ville_arrivee' => 'Marrakech']) }}" class="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg transition-colors">Réserver</a>
                         </div>
                     </div>
                 </div>
@@ -166,7 +178,8 @@
                         </div>
                         <div class="flex justify-between items-center">
                             <span class="text-2xl font-bold text-gray-900">90 MAD</span>
-                            <a href="{{ route('voyageur.recherche', ['depart' => 'rabat', 'arrivee' => 'tanger']) }}" class="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg transition-colors">Réserver</a>
+                             {{-- Le lien "Réserver" pointe vers la page de recherche avec paramètres --}}
+                            <a href="{{ route('voyageur.recherche', ['ville_depart' => 'Rabat', 'ville_arrivee' => 'Tanger']) }}" class="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg transition-colors">Réserver</a>
                         </div>
                     </div>
                 </div>
@@ -189,7 +202,8 @@
                         </div>
                         <div class="flex justify-between items-center">
                             <span class="text-2xl font-bold text-gray-900">150 MAD</span>
-                            <a href="{{ route('voyageur.recherche', ['depart' => 'marrakech', 'arrivee' => 'agadir']) }}" class="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg transition-colors">Réserver</a>
+                            {{-- Le lien "Réserver" pointe vers la page de recherche avec paramètres --}}
+                            <a href="{{ route('voyageur.recherche', ['ville_depart' => 'Marrakech', 'ville_arrivee' => 'Agadir']) }}" class="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg transition-colors">Réserver</a>
                         </div>
                     </div>
                 </div>
@@ -198,6 +212,7 @@
     </div>
 
     <!-- Nos services -->
+    {{-- Cette section reste --}}
     <div class="py-16 bg-white">
         <div class="container mx-auto px-4">
             <div class="text-center mb-12">
@@ -254,6 +269,7 @@
     </div>
 
     <!-- Comment ça marche -->
+    {{-- Cette section reste --}}
     <div id="comment-ca-marche" class="py-16 bg-gray-50">
         <div class="container mx-auto px-4">
             <div class="text-center mb-12">
@@ -272,7 +288,7 @@
                             </svg>
                         </div>
                         <h3 class="text-xl font-semibold text-gray-900 mb-2">Recherchez</h3>
-                        <p class="text-gray-600">Indiquez votre ville de départ, votre destination et la date souhaitée.</p>
+                        <p class="text-gray-600">Indiquez votre ville de départ, votre destination et la date souhaitée sur notre page de recherche.</p> {{-- Texte ajusté --}}
                     </div>
                 </div>
 
@@ -308,6 +324,7 @@
     </div>
 
     <!-- Statistiques -->
+    {{-- Cette section reste --}}
     <div class="py-16 bg-gray-900 text-white">
         <div class="container mx-auto px-4">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 text-center">
@@ -343,6 +360,7 @@
     </div>
 
     <!-- Témoignages -->
+    {{-- Cette section reste --}}
     <div class="py-16 bg-white">
         <div class="container mx-auto px-4">
             <div class="text-center mb-12">
@@ -355,11 +373,13 @@
                 <div class="bg-gray-50 rounded-xl p-6 shadow-md">
                     <div class="flex items-center mb-4">
                         <div class="h-12 w-12 rounded-full bg-gray-300 overflow-hidden mr-4">
+                            {{-- Image ou avatar --}}
                             <img src="https://static1.purepeople.com/articles/0/48/73/60/@/7051885-exclusif-karim-bennani-sur-le-platea-1200x0-2.jpg" alt="Photo de profil" class="h-full w-full object-cover">
                         </div>
                         <div>
                             <h4 class="font-semibold text-gray-900">Karim Benali</h4>
                             <div class="flex text-yellow-400">
+                                {{-- étoiles --}}
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                                 </svg>
@@ -385,11 +405,13 @@
                 <div class="bg-gray-50 rounded-xl p-6 shadow-md">
                     <div class="flex items-center mb-4">
                         <div class="h-12 w-12 rounded-full bg-gray-300 overflow-hidden mr-4">
+                            {{-- Image ou avatar --}}
                             <img src="https://boursenews.ma/uploads/actualites/60363cf8db4c5.jpg" alt="Photo de profil" class="h-full w-full object-cover">
                         </div>
                         <div>
                             <h4 class="font-semibold text-gray-900">Fatima Zahra</h4>
                             <div class="flex text-yellow-400">
+                                {{-- étoiles --}}
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                                 </svg>
@@ -415,11 +437,13 @@
                 <div class="bg-gray-50 rounded-xl p-6 shadow-md">
                     <div class="flex items-center mb-4">
                         <div class="h-12 w-12 rounded-full bg-gray-300 overflow-hidden mr-4">
+                            {{-- Image ou avatar --}}
                             <img src="https://media.licdn.com/dms/image/v2/C5603AQGktBQ1ldW8kQ/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1516945526331?e=2147483647&v=beta&t=6kD3TTLw_E3fDfIstRTzPb6ngxjWfdXGcJybQ8GkxLw" alt="Photo de profil" class="h-full w-full object-cover">
                         </div>
                         <div>
                             <h4 class="font-semibold text-gray-900">Ahmed Tazi</h4>
                             <div class="flex text-yellow-400">
+                                {{-- étoiles --}}
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                                 </svg>
@@ -444,81 +468,18 @@
         </div>
     </div>
 
-    <!-- FAQ -->
-    <div class="py-16 bg-gray-50">
-        <div class="container mx-auto px-4">
-            <div class="text-center mb-12">
-                <h2 class="text-3xl font-bold text-gray-900 mb-4">Questions fréquentes</h2>
-                <p class="text-gray-600 max-w-2xl mx-auto">Tout ce que vous devez savoir sur nos services</p>
-            </div>
-
-            <div class="max-w-3xl mx-auto">
-                <div class="space-y-4">
-                    <!-- Question 1 -->
-                    <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                        <button class="flex justify-between items-center w-full px-6 py-4 text-left font-semibold text-gray-900 focus:outline-none" onclick="toggleFAQ(this)">
-                            <span>Comment puis-je annuler ma réservation ?</span>
-                            <svg class="h-5 w-5 text-gray-500 transform rotate-0 transition-transform duration-200" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                            </svg>
-                        </button>
-                        <div class="hidden px-6 py-4 border-t border-gray-100">
-                            <p class="text-gray-600">Vous pouvez annuler votre réservation jusqu'à 24 heures avant le départ depuis votre espace personnel. Rendez-vous dans la section "Mes Réservations", sélectionnez le billet que vous souhaitez annuler et suivez les instructions. Les remboursements sont traités selon nos conditions générales.</p>
-                        </div>
-                    </div>
-
-                    <!-- Question 2 -->
-                    <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                        <button class="flex justify-between items-center w-full px-6 py-4 text-left font-semibold text-gray-900 focus:outline-none" onclick="toggleFAQ(this)">
-                            <span>Puis-je modifier ma réservation ?</span>
-                            <svg class="h-5 w-5 text-gray-500 transform rotate-0 transition-transform duration-200" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                            </svg>
-                        </button>
-                        <div class="hidden px-6 py-4 border-t border-gray-100">
-                            <p class="text-gray-600">Oui, vous pouvez modifier votre réservation jusqu'à 12 heures avant le départ. Connectez-vous à votre compte, accédez à "Mes Réservations" et cliquez sur "Modifier" à côté du billet concerné. Des frais supplémentaires peuvent s'appliquer en fonction de la différence de tarif.</p>
-                        </div>
-                    </div>
-
-                    <!-- Question 3 -->
-                    <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                        <button class="flex justify-between items-center w-full px-6 py-4 text-left font-semibold text-gray-900 focus:outline-none" onclick="toggleFAQ(this)">
-                            <span>Combien de bagages puis-je emporter ?</span>
-                            <svg class="h-5 w-5 text-gray-500 transform rotate-0 transition-transform duration-200" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                            </svg>
-                        </button>
-                        <div class="hidden px-6 py-4 border-t border-gray-100">
-                            <p class="text-gray-600">Chaque passager peut emporter gratuitement un bagage à main et une valise de taille standard (jusqu'à 20 kg). Des frais supplémentaires s'appliquent pour les bagages additionnels ou surdimensionnés. Veuillez consulter les conditions spécifiques de votre trajet lors de la réservation.</p>
-                        </div>
-                    </div>
-
-                    <!-- Question 4 -->
-                    <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                        <button class="flex justify-between items-center w-full px-6 py-4 text-left font-semibold text-gray-900 focus:outline-none" onclick="toggleFAQ(this)">
-                            <span>Comment fonctionne le billet électronique ?</span>
-                            <svg class="h-5 w-5 text-gray-500 transform rotate-0 transition-transform duration-200" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                            </svg>
-                        </button>
-                        <div class="hidden px-6 py-4 border-t border-gray-100">
-                            <p class="text-gray-600">Après votre réservation, vous recevrez un billet électronique par email. Vous pouvez soit l'imprimer, soit le présenter directement sur votre smartphone au chauffeur le jour du départ. Le billet contient un code QR qui sera scanné pour valider votre voyage.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Call to Action -->
+    {{-- Ce call to action reste et le bouton mène à la page de recherche --}}
     <div class="py-16 bg-gray-900 text-white">
         <div class="container mx-auto px-4 text-center">
             <h2 class="text-3xl font-bold mb-6">Prêt à voyager avec nous ?</h2>
             <p class="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">Réservez dès maintenant votre prochain trajet et profitez d'une expérience de voyage exceptionnelle</p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                 {{-- Le lien "Rechercher un trajet" pointe vers la page de recherche --}}
                 <a href="{{ route('voyageur.recherche') }}" class="px-8 py-3 bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-semibold rounded-lg transition-colors">
                     Rechercher un trajet
                 </a>
+                 {{-- Le lien "Créer un compte" reste --}}
                 <a href="{{ route('register') }}" class="px-8 py-3 bg-transparent hover:bg-gray-800 border border-white text-white font-semibold rounded-lg transition-colors">
                     Créer un compte
                 </a>
@@ -527,6 +488,7 @@
     </div>
 
     <!-- Partenaires -->
+    {{-- Cette section reste --}}
     <div class="py-16 bg-white">
         <div class="container mx-auto px-4">
             <div class="text-center mb-12">
@@ -535,6 +497,7 @@
             </div>
 
             <div class="flex flex-wrap justify-center items-center gap-8 md:gap-16">
+                 {{-- Logos des partenaires --}}
                 <div class="w-32 h-20 flex items-center justify-center  hover:grayscale-0 transition-all">
                     <img src="https://upload.wikimedia.org/wikipedia/ar/9/99/%D8%B4%D8%B9%D8%A7%D8%B1_%D8%B4%D8%B1%D9%83%D8%A9_CTM.png" alt="Logo partenaire" class="max-h-full">
                 </div>
@@ -555,11 +518,12 @@
     </div>
 
     <!-- Script pour la FAQ -->
+    {{-- Le script reste car il gère le comportement de la FAQ --}}
     <script>
         function toggleFAQ(element) {
             const content = element.nextElementSibling;
             const icon = element.querySelector('svg');
-            
+
             // Toggle content visibility
             if (content.classList.contains('hidden')) {
                 content.classList.remove('hidden');

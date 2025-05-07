@@ -96,10 +96,6 @@
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
                         Mes Réservations
                     </a> 
-                   <a href="{{ route('voyageur.recherche') }}" class="mr-4 rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition-colors flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"></path></svg>
-                        Historique des Réservations
-                    </a> 
                 </div>
             </div>
         </div>
@@ -121,6 +117,28 @@
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2"></path><path d="M17 3h2a2 2 0 0 1 2 2v2"></path><path d="M21 17v2a2 2 0 0 1-2 2h-2"></path><path d="M7 21H5a2 2 0 0 1-2-2v-2"></path><rect x="7" y="7" width="10" height="10" rx="2"></rect></svg>
                         Scanner Billet
                     </a>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    @if(auth()->user()->hasRole('admin')) 
+        <div class="bg-slate-700 text-white shadow-md"> 
+            <div class="container mx-auto px-4">
+                <div class="flex items-center overflow-x-auto whitespace-nowrap py-2">
+                    <a href="{{ route('admin.users.index') }}" class="mr-4 rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-600 hover:text-white transition-colors flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                        Gestion des Utilisateurs
+                    </a>
+
+                    <a href="{{ route('admin.compagnies') }}" class="mr-4 rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-600 hover:text-white transition-colors flex items-center">
+                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m3 0h5M9 7h1m0 4h1m-1 4h1m-4-8h-1m0 4h-1m0 4h-1m8-12h.01M17 16h.01" />
+                         </svg>
+                         Gestion des Compagnies
+                     </a>
                 </div>
             </div>
         </div>

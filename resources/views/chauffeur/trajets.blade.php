@@ -136,32 +136,24 @@
     </div>
     
     <script>
-    // Fonction pour afficher les détails d'un trajet
     function showTrajetDetails(trajetId) {
         const modal = document.getElementById('trajetDetailsModal');
-        
-        // Afficher le loader
         document.getElementById('trajetDetailsContent').innerHTML = `
             <div class="flex justify-center items-center py-16">
                 <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
             </div>
         `;
-        
-        // Afficher le modal avec animation
         modal.classList.remove('hidden');
         setTimeout(() => {
             modal.classList.remove('opacity-0');
             modal.querySelector('.relative').classList.remove('scale-95');
         }, 10);
         
-        // Charger les données via AJAX
         fetch(`/trajets/${trajetId}/details`)
             .then(response => response.json())
             .then(data => {
-                // Mettre à jour le titre
                 document.getElementById('trajetDetailsTitle').textContent = data.name;
-                
-                // Construire le contenu HTML
+
                 let html = `
                     <div class="px-6 py-4">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
@@ -222,7 +214,6 @@
                             <div class="space-y-6">
                 `;
                 
-                // Ajouter les étapes
                 data.sous_trajets.forEach((etape, index) => {
                     html += `
                         <div class="border border-gray-200 rounded-lg overflow-hidden">
@@ -296,8 +287,7 @@
                         </div>
                     </div>
                 `;
-                
-                // Mettre à jour le contenu
+
                 document.getElementById('trajetDetailsContent').innerHTML = html;
             })
             .catch(error => {
@@ -313,33 +303,27 @@
                 `;
             });
     }
-    
-    // Fonction pour fermer le modal
+
     function closeModal() {
         const modal = document.getElementById('trajetDetailsModal');
-        
-        // Animer la fermeture
         modal.classList.add('opacity-0');
         modal.querySelector('.relative').classList.add('scale-95');
-        
-        // Cacher après l'animation
         setTimeout(() => {
             modal.classList.add('hidden');
         }, 300);
     }
-    
-    // Fermer le modal en cliquant à l'extérieur
+
     document.getElementById('trajetDetailsModal').addEventListener('click', function(e) {
         if (e.target === this) {
             closeModal();
         }
     });
-    
-    // Fermer le modal avec la touche Escape
+
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape' && !document.getElementById('trajetDetailsModal').classList.contains('hidden')) {
             closeModal();
         }
     });
+    
     </script>
 @endsection

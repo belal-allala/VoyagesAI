@@ -9,9 +9,15 @@ class Compagnie extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['nom', 'email'];
+    protected $fillable = [
+        'nom',
+        'email',
+        'telephone',   
+        'adresse',      
+        'description',  
+        'logo'          
+    ];
 
-    // Relations
     public function users()
     {
         return $this->hasMany(User::class, 'company_id');
@@ -19,6 +25,6 @@ class Compagnie extends Model
 
     public function buses()
     {
-        return $this->hasMany(Bus::class);
+        return $this->hasMany(Bus::class,'company_id');
     }
 }

@@ -84,7 +84,7 @@ class ChauffeurController extends Controller
             })
             ->get();
 
-        return view('chauffeur.trajets', compact('trajets', 'filterDate')); // Passer $filterDate à la vue
+        return view('chauffeur.trajets', compact('trajets', 'filterDate')); 
     }
 
     public function listePassagers(Request $request)
@@ -94,7 +94,7 @@ class ChauffeurController extends Controller
 
         $trajets = Trajet::where('chauffeur_id', $chauffeur->id)->get();
 
-        $reservations = collect(); // Initialiser $reservations
+        $reservations = collect();
     
         if ($selectedTrajetDate) {
             list($trajetId, $date) = explode('_', $selectedTrajetDate);
@@ -109,8 +109,7 @@ class ChauffeurController extends Controller
         if ($request->input('export') === 'excel') {
             return Excel::download(new PassagersExport($reservations), 'passagers.xlsx');
         }
-        
-        // Formater les options du select pour chaque trajet (Nom du trajet + Date de départ)
+
         $trajetOptions = collect();
         foreach ($trajets as $trajet) {
             foreach ($trajet->sousTrajets as $sousTrajet) {
@@ -128,7 +127,7 @@ class ChauffeurController extends Controller
     {
         $chauffeur = Auth::user();
         $trajets = Trajet::where('chauffeur_id', $chauffeur->id)
-            ->with('sousTrajets') // Charger les sous-trajets pour afficher la date de départ
+            ->with('sousTrajets') 
             ->get();
         return view('chauffeur.scan', compact('trajets'));
     }
@@ -149,7 +148,7 @@ class ChauffeurController extends Controller
             return response()->json(['success' => false, 'message' => 'Billet invalide ou déjà utilisé.']);
         }
 
-        $billet->update(['status' => 'utilise']); // Marquer le billet comme utilisé
+        $billet->update(['status' => 'utilise']); 
 
         return response()->json(['success' => true, 'message' => 'Billet validé avec succès.']);
     }

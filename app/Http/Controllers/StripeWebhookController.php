@@ -49,15 +49,11 @@ class StripeWebhookController extends Controller
 
         $reservation = Reservation::find($reservationId);
         if ($reservation) {
-            // Mettre à jour le statut de la réservation à "confirmed"
-            if ($reservation->status !== 'confirmed') { // Vérification d'idempotence
+            if ($reservation->status !== 'confirmed') { 
                 $reservation->update(['status' => 'confirmed']);
-
-                // Créer le billet
-                if (!$reservation->billet) { // Vérification d'idempotence
+                if (!$reservation->billet) { 
                     $numeroBillet = uniqid('Billet_');
                     $qrCode = 'QRCODE_' . $numeroBillet;
-
                     $reservation->billet()->create([
                         'numero_billet' => $numeroBillet,
                         'qr_code' => $qrCode,
@@ -82,7 +78,7 @@ class StripeWebhookController extends Controller
         $reservationId = $paymentIntent->metadata->reservation_id;
         $reservation = Reservation::find($reservationId);
         if ($reservation) {
-            if ($reservation->status !== 'payment_failed') { // Vérification d'idempotence
+            if ($reservation->status !== 'payment_failed') { 
                 $reservation->status = 'payment_failed';
                 $reservation->save();
             }

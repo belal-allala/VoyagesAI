@@ -145,7 +145,6 @@
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Elements
             const video = document.getElementById('qr-video');
             const qrResult = document.getElementById('qr-result');
             const scannerStatus = document.getElementById('scanner-status');
@@ -155,19 +154,16 @@
             const validateManualBtn = document.getElementById('validate-manual');
             const recentScansContainer = document.getElementById('recent-scans');
             const trajetSelect = document.getElementById('trajet_id');
-            
-            // Variables
+
             let scanning = false;
             let currentStream = null;
-            let currentFacingMode = 'environment'; // 'environment' pour la caméra arrière, 'user' pour la caméra avant
+            let currentFacingMode = 'environment'; 
             let flashOn = false;
             let recentScans = [];
             let scanTimeout = null;
-            
-            // Initialiser la caméra
+
             initCamera();
-            
-            // Fonction pour initialiser la caméra
+
             function initCamera() {
                 // Arrêter le flux actuel s'il existe
                 if (currentStream) {
@@ -211,7 +207,6 @@
                     });
             }
             
-            // Fonction pour scanner
             function scan() {
                 if (!scanning) return;
                 
@@ -228,7 +223,6 @@
                     });
 
                     if (code) {
-                        // Code QR détecté
                         console.log("Code QR détecté:", code.data);
                         updateStatus('Code QR détecté! Validation en cours...');
                         
@@ -405,8 +399,7 @@
                     recentScansContainer.appendChild(scanElement);
                 });
             }
-            
-            // Fonction pour mettre à jour le statut
+
             function updateStatus(message, isError = false, bgColor = null) {
                 scannerStatus.textContent = message;
                 
@@ -416,24 +409,20 @@
                     scannerStatus.className = `${isError ? 'bg-red-600' : 'bg-gray-800'} text-white text-center py-2 text-sm`;
                 }
             }
-            
-            // Événement pour le bouton de flash
+
             toggleFlashBtn.addEventListener('click', function() {
                 if (!currentStream) return;
                 
                 const track = currentStream.getVideoTracks()[0];
-                
-                // Vérifier si la torche est disponible
+
                 const capabilities = track.getCapabilities();
                 if (!capabilities.torch) {
                     updateStatus('La torche n\'est pas disponible sur cet appareil', true);
                     return;
                 }
-                
-                // Inverser l'état de la torche
+ 
                 flashOn = !flashOn;
-                
-                // Appliquer le changement
+
                 track.applyConstraints({
                     advanced: [{ torch: flashOn }]
                 })
@@ -460,13 +449,11 @@
                 });
             });
             
-            // Événement pour le bouton de changement de caméra
             switchCameraBtn.addEventListener('click', function() {
                 currentFacingMode = currentFacingMode === 'environment' ? 'user' : 'environment';
                 initCamera();
             });
-            
-            // Événement pour la validation manuelle
+
             validateManualBtn.addEventListener('click', function() {
                 const code = manualCodeInput.value.trim();
                  const trajetId = trajetSelect.value;
@@ -480,8 +467,7 @@
                     manualCodeInput.value = '';
                 }
             });
-            
-            // Événement pour la touche Entrée dans le champ de saisie manuelle
+
             manualCodeInput.addEventListener('keypress', function(e) {
                 if (e.key === 'Enter') {
                      const trajetId = trajetSelect.value;
@@ -501,7 +487,7 @@
                  const trajetId = trajetSelect.value;
                   if (!trajetId) {
                      showResult({ success: false, message: 'Veuillez sélectionner un trajet.' }, qrCodeData);
-                       scanning = true; // Reprendre le scan
+                       scanning = true; 
                        requestAnimationFrame(scan);
                       return;
                   }

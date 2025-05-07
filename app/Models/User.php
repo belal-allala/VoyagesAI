@@ -12,12 +12,14 @@ use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne; 
 use App\Models\Compagnie;
 use App\Models\Trajet;
 use App\Models\Reservation;
 use App\Models\Notification;
 use App\Models\Bus;
 use App\Models\SousTrajet;
+use App\Models\Profile;
 
 class User extends Authenticatable
 {
@@ -40,7 +42,6 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    // Relations
     public function compagnie()
     {
         return $this->belongsTo(Compagnie::class, 'company_id');
@@ -64,5 +65,10 @@ class User extends Authenticatable
     public function hasRole($role)
     {
         return $this->role === $role;
+    }
+    
+    public function profile(): HasOne
+    {
+        return $this->hasOne(Profile::class);
     }
 }

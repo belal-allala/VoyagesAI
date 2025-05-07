@@ -31,13 +31,9 @@ class PaiementController extends Controller
         $paymentIntent = \Stripe\PaymentIntent::retrieve($request->input('payment_intent'));
 
         if ($paymentIntent->status === 'succeeded') {
-            // Mettre à jour le statut de la réservation
             $reservation->update(['status' => 'confirmed']);
-
-            // Créer le billet
             $numeroBillet = 'BLT'.strtoupper(uniqid());
             $qrCode = 'QR_'.$numeroBillet;
-
             $reservation->billet()->create([
                 'numero_billet' => $numeroBillet,
                 'qr_code' => $qrCode,

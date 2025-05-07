@@ -16,7 +16,6 @@ class Bus extends Model
         'plate_number'
     ];
 
-    // Relations
     public function compagnie()
     {
         return $this->belongsTo(Compagnie::class);

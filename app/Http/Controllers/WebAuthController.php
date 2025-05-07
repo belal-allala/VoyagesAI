@@ -13,38 +13,22 @@ use Illuminate\Validation\Rule;
 
 class WebAuthController extends Controller
 {
-    /**
-     * Display the registration view.
-     *
-     * @return \Illuminate\View\View
-     */
     public function register()
     {
         return view('auth.register'); 
     }
 
-    /**
-     * Handle a registration request for the application.
-     *
-     * @param  \App\Http\Requests\RegisterRequest  $request  //Request de validation
-     */
     public function handleRegister(RegisterRequest $request)
     {
-        $data = [
-            'nom' => $request->name, 
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => $request->role,
-        ];
-
-        // // Si c'est un employé, on peut associer une compagnie
-        // if ($request->role === 'employe' && $request->has('company_id')) {
-        //     $data['company_id'] = $request->company_id;
-        // }
-
-        User::create($data);
-
-        return redirect()->route('welcome')->with('message', 'Compte créé avec succès. Veuillez vous connecter.');
+        $validatedData = $request->validated();
+        $user = User::create([
+            'nom' => $validatedData['name'],
+            'email' => $validatedData['email'],
+            'password' => Hash::make($validatedData['password']),
+            'role' => $validatedData['role'],
+        ]);
+        $user->profile()->create([]);
+        return redirect()->route('login')->with('message', 'Compte créé avec succès. Veuillez vous connecter.');
     }
 
     public function logout(Request $request)

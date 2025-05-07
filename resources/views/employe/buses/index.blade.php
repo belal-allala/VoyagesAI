@@ -139,7 +139,6 @@
                     </table>
                 </div>
                 
-                <!-- Pagination (if available) -->
                 @if(isset($buses) && method_exists($buses, 'links'))
                     <div class="mt-4">
                         {{ $buses->links() }}
@@ -168,7 +167,6 @@
         }
     }
 
-    // Soumission AJAX optionnelle
     document.getElementById('busForm')?.addEventListener('submit', async function(e) {
         e.preventDefault();
         

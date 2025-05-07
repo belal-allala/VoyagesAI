@@ -5,7 +5,7 @@
 @section('content')
 <div class="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-md mx-auto bg-white rounded-2xl shadow-xl overflow-hidden md:max-w-lg">
-        <!-- En-tête avec logo -->
+    
         <div class="bg-gray-900 px-8 py-6 text-center">
             <div class="flex justify-center mb-4">
                 <img src="{{ asset('images/logo.png') }}" alt="Vega Go Logo" class="h-[200px] w-[200px] rounded-full">
@@ -13,12 +13,10 @@
             <h1 class="text-2xl font-bold text-white">Créer votre compte</h1>
         </div>
         
-        <!-- Contenu du formulaire -->
         <div class="p-8">
             <form method="POST" action="{{ route('register') }}" class="space-y-6">
                 @csrf
 
-                <!-- Champ Nom -->
                 <div>
                     <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Nom complet</label>
                     <div class="relative">

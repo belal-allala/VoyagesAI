@@ -38,13 +38,13 @@ class BusController extends Controller
             'company_id' => auth()->user()->company_id
         ]);
 
-        if ($request->ajax()) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Bus ajouté avec succès!',
-                'bus' => $bus
-            ]);
-        }
+        // if ($request->ajax()) {
+        //     return response()->json([
+        //         'success' => true,
+        //         'message' => 'Bus ajouté avec succès!',
+        //         'bus' => $bus
+        //     ]);
+        // }
 
         return redirect()->route('buses.index')
                         ->with('success', 'Bus ajouté avec succès!');
@@ -56,7 +56,6 @@ class BusController extends Controller
         if ($bus->company_id !== auth()->user()->company_id) {
             abort(403, 'Accès non autorisé');
         }
-
         return view('employe.buses.edit', compact('bus'));
     }
 

@@ -5,6 +5,21 @@
 @section('content')
 <div class="container mx-auto py-8 px-4">
     <div class="max-w-3xl mx-auto">
+        @if(session('success'))
+            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+                {{ session('success') }}
+            </div>
+        @endif
+        @if(session('info'))
+            <div class="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded mb-4">
+                {{ session('info') }}
+            </div>
+        @endif
+        @if(session('error'))
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                {{ session('error') }}
+            </div>
+        @endif
         <!-- En-tête avec étapes de réservation -->
         <div class="mb-8">
             <h1 class="text-2xl font-bold text-gray-900 mt-4 mb-6">Détails de votre réservation</h1>
@@ -206,16 +221,37 @@
             
             <!-- Actions -->
             <div class="p-6 bg-gray-50 border-t border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4">
-                @if($reservation->status === 'confirmed')
+                @php
+                    $now = now();
+                    $departureTime = $firstSousTrajet->departure_time;
+                    $isMoreThan24h = $now->diffInHours($departureTime, false) > 24;
+                    $isUpcoming = $departureTime > $now;
+                @endphp
+    
+                @if($reservation->status === 'confirmed' && $isMoreThan24h && $isUpcoming)
                     <form action="{{ route('voyageur.reservations.annuler', $reservation) }}" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir annuler cette réservation ?')">
                         @csrf
-                        <button type="submit" class="bg-red-100 hover:bg-red-200 text-red-700 font-medium py-2 px-4 rounded-lg transition-colors w-full sm:w-auto">Annuler la réservation</button>
+                        <button type="submit" class="bg-red-100 hover:bg-red-200 text-red-700 font-medium py-2 px-4 rounded-lg transition-colors w-full sm:w-auto">
+                            Annuler la réservation
+                        </button>
+                    </form>
+                @elseif($reservation->status !== 'confirmed' && $isUpcoming)
+                    <form action="{{ route('reservations.paiement.initier', $reservation) }}" method="POST">
+                        @csrf
+                        <button type="submit" 
+                                class="bg-green-100 hover:bg-green-200 text-green-700 font-medium py-2 px-4 rounded-lg transition-colors w-full sm:w-auto text-center"
+                                @if($reservation->status === 'pending_payment') disabled @endif>
+                                Payer maintenant
+                        </button>
                     </form>
                 @endif
+                
                 <div class="flex gap-4 w-full sm:w-auto">
-                    <a href="{{ route('voyageur.ticketPdf', $reservation) }}" class="bg-blue-100 hover:bg-blue-200 text-blue-700 font-medium py-2 px-4 rounded-lg transition-colors text-center w-full sm:w-auto">
-                        Télécharger le billet
-                    </a>
+                    @if($reservation->billet && $reservation->trajet->status !== 'Passé')
+                        <a href="{{ route('voyageur.ticketPdf', $reservation) }}" class="bg-blue-100 hover:bg-blue-200 text-blue-700 font-medium py-2 px-4 rounded-lg transition-colors text-center w-full sm:w-auto">
+                            Télécharger le billet
+                        </a>
+                    @endif
                     <a href="{{ route('voyageur.reservations') }}" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors text-center w-full sm:w-auto">
                         Mes Réservations
                     </a>

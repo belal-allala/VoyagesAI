@@ -185,6 +185,7 @@
                 <input type="hidden" name="date_arrivee" value="{{ $trajetData['date_arrivee'] }}">
                 <input type="hidden" name="ville_arrivee" value="{{ $trajetData['ville_arrivee'] }}">
                 
+                
                 <h3 class="text-lg font-semibold text-gray-900 mb-4">Détails de la réservation</h3>
                 
                 <div class="mb-6">

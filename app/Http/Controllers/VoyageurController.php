@@ -17,6 +17,7 @@ use Stripe\Stripe;
 use Stripe\PaymentIntent;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Str;
 
 
 
@@ -36,6 +37,10 @@ class VoyageurController extends Controller
         ]);
 
         $dateRecherche = Carbon::parse($validated['date_depart'])->toDateString();
+        $dateAujourdhui = Carbon::today()->toDateString();
+        if ($dateRecherche < $dateAujourdhui) {
+            return back()->with('error', 'Vous ne pouvez pas rechercher des trajets avec une date passée.');
+        }
 
         $trajetsCorrespondants=Trajet::whereHas('sousTrajets', function ($query) use ($validated, $dateRecherche) {
             $query->where('departure_city', $validated['ville_depart'])
@@ -150,13 +155,10 @@ public function storeReservation(Request $request)
     $reservation->status = 'pending';
     $reservation->save();
 
-    // Initialisation de Stripe
     Stripe::setApiKey(config('services.stripe.secret'));
-
-    // Création du Payment Intent
     try {
         $paymentIntent = PaymentIntent::create([
-            'amount' => $prixTotal * 100, // Montant en centimes
+            'amount' => $prixTotal * 100, 
             'currency' => 'mad',
             'metadata' => [
                 'reservation_id' => $reservation->id, 
@@ -165,12 +167,9 @@ public function storeReservation(Request $request)
             'payment_method_types' => ['card'], 
         ]);
     } catch (\Exception $e) {
-        // Gérer les erreurs lors de la création du Payment Intent
         \Log::error('Erreur lors de la création du Payment Intent : ' . $e->getMessage());
         return back()->with('error', 'Une erreur s\'est produite lors de la préparation du paiement. Veuillez réessayer.');
     }
-
-    // Redirection vers la page de paiement avec le client_secret
     return redirect()->route('paiement.index', $reservation)
                     ->with('stripe_client_secret', $paymentIntent->client_secret) 
                      ->with('success', 'Réservation créée. Veuillez procéder au paiement.');
@@ -198,77 +197,94 @@ public function confirmationPaiement(Reservation $reservation)
         $nbEtapes = count($etapes);
 
         $departTrouve = false;
-        // $arriveeTrouvee = false;
         $itineraireCouvert = false;
-        // $villePrecedente = null;
 
         for ($i = 0; $i < $nbEtapes; $i++) {
             $etape = $etapes[$i];
 
             if ($etape->departure_city === $villeDepart && !$departTrouve) {
                 $departTrouve = true;
-                // $villePrecedente = $etape->departure_city;
             }
 
-            if ($departTrouve /*&& $villePrecedente === $etape->departure_city*/) {
+            if ($departTrouve ) {
                 if ($etape->destination_city === $villeArrivee) {
-                    // $arriveeTrouvee = true;
                     $itineraireCouvert = true;
                     break;
                 }
-                // $villePrecedente = $etape->destination_city; 
             }
         }
 
         return  $itineraireCouvert;
     }
 
-    public function generateTicketPdf(Reservation $reservation) {
-    // Vérifications d'accès
-    if ($reservation->user_id !== auth()->id()) abort(403);
-    if ($reservation->status !== 'confirmed') {
-        return redirect()->back()->with('error', 'Réservation non confirmée');
-    }
-
-    // Générer le QR code en SVG (sans dépendance à Imagick)
-    $qrCodeSvg = QrCode::size(200)->style('square')->generate($reservation->billet->numero_billet);
-
-    // Passer les données à la vue
-    $pdf = Pdf::loadView('voyageur.ticket_pdf', [
-        'reservation' => $reservation,
-        'qrCodeSvg' => $qrCodeSvg, // SVG brut
-    ]);
-
-    // Autoriser les images externes (si nécessaire)
-    $pdf->setOption('isRemoteEnabled', true);
-    $pdf->setOption('isHtml5ParserEnabled', true);
-
-    return View('voyageur.ticket_pdf', [
-        'reservation' => $reservation,
-        'qrCodeSvg' => $qrCodeSvg, 
-    ]);
-}
-
-public function mesReservations()
+    public function generateTicketPdf(Reservation $reservation)
     {
-        $user = Auth::user();
+        if ($reservation->user_id !== auth()->id()) {
+            abort(403, 'Accès non autorisé.');
+        }
+        if ($reservation->status !== 'confirmed') {
+            return redirect()->back()->with('error', 'Cette réservation n\'est pas confirmée et son billet ne peut pas être généré.');
+        }
+        if (!$reservation->billet) {
+            return redirect()->back()->with('error', 'Aucun billet trouvé pour cette réservation.');
+        }
+        $qrCodeSvg = QrCode::size(200)->style('square')->generate($reservation->billet->numero_billet);
+        $qrCodeBase64 = base64_encode($qrCodeSvg);
+        $qrCodeDataUrl = 'data:image/svg+xml;base64,' . $qrCodeBase64;
+        $pdf = Pdf::loadView('voyageur.ticket_pdf', [
+            'reservation' => $reservation,
+            'qrCodeDataUrl' => $qrCodeDataUrl, 
+        ]);
+        $pdf->setOptions([
+            'isHtml5ParserEnabled' => true,
+            'isRemoteEnabled' => true,
+        ]);
+        $numeroBillet = $reservation->billet->numero_billet;
+        $villeDepartSlug = Str::slug($reservation->ville_depart);
+        $villeArriveeSlug = Str::slug($reservation->ville_arrivee);
+        $dateFormat = $reservation->date_depart->format('Ymd');
 
-        // Réservations futures (date_depart >= aujourd'hui)
-        $reservationsActives = Reservation::where('user_id', $user->id)
-            ->where('date_depart', '>=', now())
-            ->with(['trajet', 'trajet.bus', 'trajet.chauffeur', 'billet'])
-            ->orderBy('date_depart')
-            ->get();
-
-        // Historique des réservations (date_depart < aujourd'hui)
-        $reservationsHistorique = Reservation::where('user_id', $user->id)
-            ->where('date_depart', '<', now())
-            ->with(['trajet', 'trajet.bus', 'trajet.chauffeur', 'billet'])
-            ->orderBy('date_depart', 'desc')
-            ->get();
-
-        return view('voyageur.reservations.index', compact('reservationsActives', 'reservationsHistorique'));
+        $filename = "Ticket_{$numeroBillet}_{$villeDepartSlug}_to_{$villeArriveeSlug}_{$dateFormat}.pdf";
+        return $pdf->download($filename);
     }
+
+
+public function mesReservations(Request $request)
+{
+    $user = Auth::user();
+
+    $filter = $request->filter ?? 'À venir'; 
+
+    $reservations = Reservation::where('user_id', $user->id)
+        ->with(['trajet', 'trajet.bus', 'trajet.chauffeur', 'billet', 'trajet.sousTrajets'])
+        ->whereHas('trajet', function($query) use ($filter) {
+            $query->where(function($q) use ($filter) {
+                $now = Carbon::now();
+                
+                switch ($filter) {
+                    case 'En cours':
+                        $q->whereHas('sousTrajets', function($sq) use ($now) {
+                            $sq->where('departure_time', '<=', $now)
+                               ->where('arrival_time', '>=', $now);
+                        });
+                        break;
+                    case 'Passé':
+                        $q->whereHas('sousTrajets', function($sq) use ($now) {
+                            $sq->where('arrival_time', '<', $now);
+                        });
+                        break;
+                    default: 
+                        $q->whereHas('sousTrajets', function($sq) use ($now) {
+                            $sq->where('departure_time', '>', $now);
+                        });
+                }
+            });
+        })
+        ->orderBy('created_at', 'desc')
+        ->get();
+
+    return view('voyageur.reservations.index', compact('reservations'));
+}
 
     public function reservationDetails(Reservation $reservation)
     {
@@ -276,22 +292,63 @@ public function mesReservations()
             abort(403, 'Accès non autorisé');
         }
 
-        $reservation->load(['trajet.sousTrajets', 'billet']); // Charger les sous-trajets et le billet
+        $reservation->load(['trajet.sousTrajets', 'billet']);
 
         return view('voyageur.reservations.details', compact('reservation'));
     }
 
-    // (Optionnel)
     public function annulerReservation(Request $request, Reservation $reservation)
     {
         if ($reservation->user_id !== Auth::id()) {
             abort(403, 'Accès non autorisé');
         }
-
-        // Ajouter une logique pour vérifier si l'annulation est possible (par exemple, en fonction de la date de départ)
         
-        $reservation->update(['status' => 'cancelled']); // Ou un autre statut approprié
+        $reservation->update(['status' => 'cancelled']); 
         
         return redirect()->route('voyageur.reservations')->with('success', 'Réservation annulée avec succès.');
+    }
+
+
+    public function initierPaiement(Request $request, Reservation $reservation)
+    {
+        if ($reservation->user_id !== auth()->id()) {
+            abort(403, 'Accès non autorisé');
+        }
+
+        if ($reservation->status === 'confirmed') {
+            return back()
+                ->with('info', 'Cette réservation est déjà confirmée et payée');
+        }
+
+        if ($reservation->trajet->status !== 'À venir') {
+            return back()
+                ->with('error', 'Le trajet a déjà eu lieu, impossible de procéder au paiement');
+        }
+
+        Stripe::setApiKey(config('services.stripe.secret'));
+
+        try {
+            $paymentIntent = PaymentIntent::create([
+                'amount' => $reservation->prix_total * 100,
+                'currency' => 'mad',
+                'metadata' => [
+                    'reservation_id' => $reservation->id,
+                    'user_id' => auth()->id(),
+                ],
+                'payment_method_types' => ['card'],
+            ]);
+
+            return redirect()
+                ->route('paiement.index', $reservation)
+                ->with([
+                    'stripe_client_secret' => $paymentIntent->client_secret,
+                    'success' => 'Veuillez compléter votre paiement'
+                ]);
+
+        } catch (\Exception $e) {
+            
+            return back()
+                ->with('error', 'Une erreur est survenue lors de la préparation du paiement');
+        }
     }
 }

@@ -204,14 +204,12 @@
     <script src="https://js.stripe.com/v3/"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Initialiser Stripe
             const stripe = Stripe('{{ env('STRIPE_KEY') }}');
             if (!stripe) {
                 document.getElementById('card-errors').textContent = 'Erreur de configuration du paiement.';
                 return;
             }
             
-            // Récupérer le clientSecret de la session
             const clientSecret = "{{ session('stripe_client_secret') }}";
             if (!clientSecret || !clientSecret.includes('_secret_')) {
                 const errorDiv = document.getElementById('card-errors');
@@ -221,7 +219,6 @@
             }
             const elements = stripe.elements({ clientSecret: clientSecret });
             
-            // Style personnalisé pour les éléments Stripe
             const style = {
                 base: {
                     color: '#4B5563',
@@ -239,7 +236,6 @@
                 }
             };
             
-            // Créer et monter les éléments Stripe
             const cardNumber = elements.create('cardNumber', { 
                 style: style,
                 placeholder: '1234 1234 1234 1234'
@@ -258,7 +254,6 @@
             cardExpiry.mount('#card-expiry');
             cardCvc.mount('#card-cvc');
             
-            // Gérer les erreurs en temps réel
             const handleError = (event) => {
                 const errorDiv = document.getElementById('card-errors');
                 errorDiv.textContent = event.error ? event.error.message : '';
@@ -268,7 +263,6 @@
             cardExpiry.on('change', handleError);
             cardCvc.on('change', handleError);
             
-            // Gérer la soumission du formulaire
             const form = document.getElementById('payment-form');
             const submitButton = document.getElementById('submit-button');
             const buttonText = document.getElementById('button-text');
@@ -299,32 +293,26 @@
                     buttonText.textContent = 'Payer {{ number_format($reservation->prix_total, 2) }} MAD';
                     buttonSpinner.classList.add('hidden');
                 } else {
-                    // Envoyer le payment_intent au serveur
                     const form = document.getElementById('payment-form');
                     const hiddenInput = document.createElement('input');
                     hiddenInput.setAttribute('type', 'hidden');
                     hiddenInput.setAttribute('name', 'payment_intent');
                     hiddenInput.setAttribute('value', paymentIntent.id);
                     form.appendChild(hiddenInput);
-                    
-                    // Soumettre le formulaire normalement
                     form.submit();
                 }
             });
             
-            // Gestion des méthodes de paiement (pour une future implémentation)
             const paymentMethods = document.querySelectorAll('.payment-method');
             paymentMethods.forEach(method => {
                 method.addEventListener('click', function() {
                     if (!this.classList.contains('cursor-not-allowed')) {
-                        // Supprimer la classe active de toutes les méthodes
                         paymentMethods.forEach(m => {
                             if (!m.classList.contains('cursor-not-allowed')) {
                                 m.classList.remove('active', 'border-yellow-500', 'bg-yellow-50');
                             }
                         });
                         
-                        // Ajouter la classe active à la méthode cliquée
                         this.classList.add('active', 'border-yellow-500', 'bg-yellow-50');
                     }
                 });
@@ -333,7 +321,6 @@
     </script>
     
     <style>
-        /* Styles pour les éléments Stripe */
         .stripe-element {
             box-sizing: border-box;
             padding: 10px 12px;
@@ -358,7 +345,6 @@
             background-color: #fefde5 !important;
         }
         
-        /* Animation pour le spinner */
         @keyframes spin {
             from {
                 transform: rotate(0deg);
@@ -372,7 +358,6 @@
             animation: spin 1s linear infinite;
         }
         
-        /* Style pour la méthode de paiement active */
         .payment-method.active {
             border-color: #F59E0B;
             background-color: #FFFBEB;

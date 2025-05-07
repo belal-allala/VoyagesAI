@@ -93,9 +93,11 @@
                                 <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" />
                             </svg>
                         </div>
-                        <input type="date" id="date_depart" name="date_depart" value="{{ request('date_depart') }}"
-                               class="pl-10 block w-full rounded-lg border-gray-300 shadow-sm focus:border-yellow-500 focus:ring focus:ring-yellow-500 focus:ring-opacity-50"
-                               required>
+                        <input type="date" id="date_depart" name="date_depart" 
+                            value="{{ request('date_depart') }}"
+                            min="{{ \Carbon\Carbon::today()->format('Y-m-d') }}"
+                            class="pl-10 block w-full rounded-lg border-gray-300 shadow-sm focus:border-yellow-500 focus:ring focus:ring-yellow-500 focus:ring-opacity-50"
+                            required>
                     </div>
                 </div>
             </div>
@@ -124,27 +126,6 @@
             </div>
             @endif
         </div>
-
-        @if(env('APP_DEBUG'))
-        <div class="bg-gray-100 p-4 mb-6 rounded-lg">
-            <details>
-                <summary class="font-bold cursor-pointer">Debug: Format des données ({{ $trajetsCorrespondants->count() ?? 0 }} résultats)</summary>
-                <pre class="bg-white p-2 mt-2 text-xs overflow-x-auto">{{ json_encode($trajetsCorrespondants->map(function($trajet) {
-                    return [
-                        'trajet_id' => $trajet->id,
-                        'trajet_name' => $trajet->name,
-                        'bus' => $trajet->bus->only(['name', 'plate_number']),
-                        'chauffeur' => $trajet->chauffeur->nom,
-                        'prix_partiel' => $trajet->prix_partiel,
-                        'sous_trajets_pertinents' => $trajet->sousTrajetsPertinents->map(function($st) {
-                            return $st->only(['departure_city', 'destination_city', 'departure_time', 'arrival_time', 'price']);
-                        }),
-                        'sous_trajets_complets' => $trajet->sousTrajets->count()
-                    ];
-                }), JSON_PRETTY_PRINT) }}</pre>
-            </details>
-        </div>
-        @endif
 
         @if($trajetsCorrespondants->isEmpty())
             <div class="bg-white rounded-xl shadow-md p-8 text-center">
@@ -199,8 +180,8 @@
                                             </svg>
                                         </div>
                                         <div>
-                                            <h3 class="font-semibold text-gray-900">{{ $trajet->name }}</h3>
-                                            <p class="text-sm text-gray-500">{{ $trajet->bus->name }} ({{ $trajet->bus->plate_number }})</p>
+                                            <h3 class="font-semibold text-gray-900">{{ $trajet->bus->name }}</h3>
+                                            <p class="text-sm text-gray-500">{{ $firstSousTrajet->departure_time }} </p>
                                         </div>
                                     </div>
                                 </div>
@@ -303,7 +284,9 @@
                                     <input type="hidden" name="sous_trajets[{{ $index }}][arrival_time]" value="{{ $sousTrajet->arrival_time }}">
                                     <input type="hidden" name="sous_trajets[{{ $index }}][price]" value="{{ $sousTrajet->price }}">
                                 @endforeach
-                                
+                                <input type="hidden" name="original_ville_depart" value="{{ request('ville_depart') }}">
+                                <input type="hidden" name="original_ville_arrivee" value="{{ request('ville_arrivee') }}">
+                                <input type="hidden" name="original_date_depart" value="{{ request('date_depart') }}">
                                 <button type="submit" class="bg-yellow-500 hover:bg-yellow-600 text-white font-medium py-2 px-6 rounded-lg transition-colors">
                                     Réserver
                                 </button>

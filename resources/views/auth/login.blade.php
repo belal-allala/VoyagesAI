@@ -5,15 +5,12 @@
 @section('content')
 <div class="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-md mx-auto bg-white rounded-2xl shadow-xl overflow-hidden md:max-w-lg">
-        <!-- En-tête avec logo -->
         <div class="bg-gray-900 px-8 py-6 text-center">
             <div class="flex justify-center mb-4">
                 <img src="{{ asset('images/logo.png') }}" alt="Vega Go Logo" class="h-[150px] w-[150px] rounded-full">
             </div>
             <h1 class="text-2xl font-bold text-white">Connectez-vous</h1>
         </div>
-        
-        <!-- Contenu du formulaire -->
         <div class="p-8">
             @if (session('status'))
                 <div class="mb-6 p-4 bg-green-50 border-l-4 border-green-500 text-green-700 rounded-lg">
@@ -29,7 +26,6 @@
             <form method="POST" action="{{ route('login') }}" class="space-y-6">
                 @csrf
 
-                <!-- Champ Email -->
                 <div>
                     <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Adresse email</label>
                     <div class="relative">

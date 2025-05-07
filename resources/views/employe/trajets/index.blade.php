@@ -259,7 +259,6 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Gestion des sous-trajets
     const container = document.getElementById('sousTrajetsContainer');
     const addButton = document.getElementById('addSousTrajet');
     
@@ -346,7 +345,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Fonction pour afficher les détails d'un trajet
     function showTrajetDetails(trajetId) {
-        // Afficher le loader
         document.getElementById('trajetDetailsContent').innerHTML = `
             <div class="flex justify-center py-8">
                 <svg class="animate-spin h-8 w-8 text-purple-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -355,18 +353,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 </svg>
             </div>
         `;
-        
-        // Afficher le modal
         document.getElementById('trajetDetailsModal').classList.remove('hidden');
         
-        // Charger les données via AJAX
         fetch(`/trajets/${trajetId}/details`)
             .then(response => response.json())
             .then(data => {
-                // Mettre à jour le titre
                 document.getElementById('trajetDetailsTitle').textContent = `Détails du trajet: ${data.name}`;
-                
-                // Construire le contenu HTML
                 let html = `
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                         <div>
@@ -393,8 +385,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         <h4 class="font-semibold text-gray-700 mb-2">Étapes du trajet:</h4>
                         <div class="space-y-4">
                 `;
-                
-                // Ajouter les étapes
                 data.sous_trajets.forEach((etape, index) => {
                     html += `
                         <div class="border rounded-lg p-4 mb-4 bg-gray-50">
@@ -448,8 +438,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         </div>
                     </div>
                 `;
-                
-                // Mettre à jour le contenu
                 document.getElementById('trajetDetailsContent').innerHTML = html;
             })
             .catch(error => {
@@ -461,8 +449,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 `;
             });
     }
-    
-    // Fonction pour fermer le modal
     function closeModal() {
         document.getElementById('trajetDetailsModal').classList.add('hidden');
     }

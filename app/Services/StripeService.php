@@ -2,15 +2,10 @@
 
 namespace App\Services;
 
-use Stripe\StripeClient; // Importez StripeClient
+use Stripe\StripeClient; 
 
 class StripeService
 {
-    /**
-     * Get a Stripe client instance.
-     *
-     * @return \Stripe\StripeClient
-     */
     public function getStripeClient(): StripeClient
     {
         return new StripeClient(config('services.stripe.secret'));
