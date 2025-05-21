@@ -1,6 +1,6 @@
 # Vega Go
 
-![Logo Vega Go](./public/images/VegaGo.png)
+![Logo Vega Go](./public/images/VegaGo.jpg)
 
 ## Description du Projet
 
