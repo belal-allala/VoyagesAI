@@ -1,7 +1,5 @@
 # Vega Go
 
-![Logo Vega Go](./public/images/VegaGo.jpg)
-
 ## Description du Projet
 
 Vega Go est une plateforme web moderne visant à digitaliser et optimiser l'écosystème du transport en bus. Le projet couvre l'intégralité du cycle de vie du voyage, de la recherche et réservation de billets pour les voyageurs, à la gestion complète des flottes, des trajets (y compris la planification récurrente complexe), et des chauffeurs pour les compagnies de transport. La plateforme inclut également des outils dédiés pour les chauffeurs (validation de billets via QR code) et une interface d'administration globale.
