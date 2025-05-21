@@ -70,7 +70,6 @@
                     <!-- Étapes seront ajoutées ici -->
                 </div>
 
-                <!-- Section Récurrence -->
                 <div class="mb-6 p-4 border rounded-lg">
                     <h3 class="text-lg font-semibold mb-3">Options de récurrence</h3>
                     
@@ -82,7 +81,6 @@
                             <option value="daily">Quotidien</option>
                             <option value="weekly">Hebdomadaire</option>
                             <option value="monthly">Mensuel</option>
-                            <option value="custom">Personnalisé</option>
                         </select>
                     </div>
                     

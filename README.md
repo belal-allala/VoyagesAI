@@ -1,6 +1,6 @@
 # Vega Go
 
-![Logo Vega Go (Si vous avez une image)]()
+![Logo Vega Go](./public/images/VegaGo.png)
 
 ## Description du Projet
 
@@ -67,7 +67,7 @@ Suivez ces étapes pour mettre en place le projet sur votre machine locale :
 
 1.  **Cloner le dépôt :**
     ```bash
-    git clone [URL_DE_VOTRE_DEPOT]
+    git clone https://github.com/belal-allala/VoyagesAI.git
     cd vega-go
     ```
 
@@ -111,19 +111,8 @@ Suivez ces étapes pour mettre en place le projet sur votre machine locale :
     php artisan migrate
     ```
 
-8.  **Lier le dossier de stockage public :**
-    ```bash
-    php artisan storage:link
-    ```
-    *(Nécessaire pour les uploads de fichiers comme les logos de compagnie ou les photos de profil)*
 
-9.  **(Optionnel) Exécuter les seeders :**
-    Si vous avez des seeders pour ajouter des données de test (utilisateurs, compagnies, bus, trajets), exécutez-les :
-    ```bash
-    php artisan db:seed
-    ```
-
-10. **Lancer le serveur de développement :**
+8. **Lancer le serveur de développement :**
     ```bash
     php artisan serve
     ```
@@ -135,13 +124,6 @@ Le projet devrait maintenant être accessible à l'adresse `http://localhost:800
 *   **Accès :** Ouvrez votre navigateur et naviguez vers l'URL de l'application (par défaut `http://localhost:8000`).
 *   **Inscription/Connexion :** Utilisez les liens `Inscription` ou `Connexion` dans la barre de navigation pour créer un compte ou vous connecter. Vous pouvez choisir votre rôle lors de l'inscription (voyageur, employé, chauffeur). L'administrateur est généralement créé via un seeder ou manuellement dans la base de données.
 *   **Navigation :** La barre de navigation s'adapte au rôle de l'utilisateur connecté pour afficher les liens pertinents vers les espaces Voyageur, Employé, Chauffeur ou Admin.
-
-### Gestion des Trajets Récurrents
-
-Le système utilise une commande console pour générer les occurrences de trajets récurrents. Vous pouvez exécuter cette commande manuellement pour tester :
-```bash
-php artisan trajets:generate-recurring
-```
 
 ### Structure Principale du Projet
 
